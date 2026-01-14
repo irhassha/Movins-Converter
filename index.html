@@ -1,9 +1,9 @@
 <!DOCTYPE html>
-<html lang="id" class="scroll-smooth">
+<html lang="en" class="scroll-smooth">
 <head>
     <meta charset="utf-8"/>
     <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
-    <title>NPCT1 PLANNING - BAPLIE TO MOVINS CONVERTER - Smart Detect Version</title>
+    <title>NPCT1 PLANNING - MOVINS CONVERTER - V.2.9</title>
     <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com?plugins=forms,typography"></script>
     <!-- Fonts & Icons -->
@@ -29,9 +29,36 @@
         ::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 4px; }
         .dark ::-webkit-scrollbar-thumb { background: #475569; }
         ::-webkit-scrollbar-thumb:hover { background: #94a3b8; }
+        .animate-fade-in-up { animation: fadeInUp 0.5s ease-out; }
+        .animate-fade-in { animation: fadeIn 0.5s ease-out; }
+        @keyframes fadeInUp { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
+        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+        
+        .tab-active {
+            border-bottom: 3px solid #3b82f6;
+            color: #2563eb;
+            font-weight: 700;
+            background-color: rgba(59, 130, 246, 0.05);
+        }
+        .dark .tab-active {
+            border-bottom: 3px solid #60a5fa;
+            color: #60a5fa;
+            background-color: rgba(96, 165, 250, 0.1);
+        }
+        .tab-inactive {
+            color: #64748b;
+            border-bottom: 3px solid transparent;
+        }
+        .dark .tab-inactive {
+            color: #94a3b8;
+        }
+        .tab-inactive:hover {
+            color: #334155;
+            border-bottom: 3px solid #cbd5e1;
+        }
     </style>
 </head>
-<body class="bg-slate-50 dark:bg-slate-900 text-slate-800 dark:text-slate-200 transition-colors duration-300 font-sans min-h-screen flex flex-col relative pb-24">
+<body class="bg-slate-50 dark:bg-slate-900 text-slate-800 dark:text-slate-200 transition-colors duration-300 font-sans min-h-screen flex flex-col relative pb-32">
 
     <!-- HEADER -->
     <header class="sticky top-0 z-40 w-full backdrop-blur-lg bg-white/80 dark:bg-slate-900/80 border-b border-slate-200 dark:border-slate-800">
@@ -42,9 +69,9 @@
                 </div>
                 <div>
                     <h1 class="text-lg font-bold bg-clip-text text-transparent bg-gradient-to-r from-slate-900 to-slate-600 dark:from-white dark:to-slate-400">
-                        NPCT1 PLANNING - BAPLIE TO MOVINS CONVERTER
+                        NPCT1 PLANNING - MOVINS CONVERTER & BAPLIE EDITOR
                     </h1>
-                    <p class="text-xs text-slate-500 dark:text-slate-400 font-medium">Smart Detect Version - Skuy Gasskeuun</p>
+                    <p class="text-xs text-slate-500 dark:text-slate-400 font-medium">Skuy Gasskeuun</p>
                 </div>
             </div>
             <button onclick="toggleDarkMode()" class="p-2 rounded-full hover:bg-slate-100 dark:hover:bg-slate-800 text-slate-500 transition-all focus:outline-none focus:ring-2 focus:ring-blue-500">
@@ -57,21 +84,20 @@
     <main class="flex-grow container mx-auto px-4 py-8 max-w-6xl">
         
         <!-- UPLOAD SECTION -->
-        <div class="mb-10 animate-fade-in-up">
-            <label for="fileInput" class="group relative flex flex-col items-center justify-center w-full h-48 border-2 border-dashed border-slate-300 dark:border-slate-600 rounded-2xl bg-white dark:bg-slate-800 hover:bg-blue-50 dark:hover:bg-slate-700/50 hover:border-blue-400 dark:hover:border-blue-500 transition-all cursor-pointer overflow-hidden shadow-sm hover:shadow-md">
+        <div class="mb-8 animate-fade-in-up">
+            <label for="fileInput" class="group relative flex flex-col items-center justify-center w-full h-40 border-2 border-dashed border-slate-300 dark:border-slate-600 rounded-2xl bg-white dark:bg-slate-800 hover:bg-blue-50 dark:hover:bg-slate-700/50 hover:border-blue-400 dark:hover:border-blue-500 transition-all cursor-pointer overflow-hidden shadow-sm hover:shadow-md">
                 <div class="flex flex-col items-center justify-center pt-5 pb-6 z-10">
                     <div class="p-3 bg-blue-50 dark:bg-slate-700 rounded-full mb-3 group-hover:scale-110 transition-transform duration-300">
                         <span class="material-icons-round text-3xl text-blue-500 dark:text-blue-400">cloud_upload</span>
                     </div>
                     <p class="mb-1 text-sm text-slate-600 dark:text-slate-300 font-medium group-hover:text-blue-600 dark:group-hover:text-blue-400">
-                        <span id="labelFile">Klik untuk memilih file PRE MOVINS (.edi)</span>
+                        <span id="labelFile">Click to select BAPLIE file (.edi)</span>
                     </p>
-                    <p class="text-xs text-slate-400 dark:text-slate-500">Mendukung BAPLIE v1.5 (SMDG15) & v2.x (SMDG20+)</p>
+                    <p class="text-xs text-slate-400 dark:text-slate-500">Support v1.5 - v2.2</p>
                 </div>
                 <input id="fileInput" type="file" class="hidden" accept=".edi,.txt" />
             </label>
             
-            <!-- Version Indicator -->
             <div id="versionIndicator" class="hidden mt-2 text-center">
                 <span class="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-400 border border-green-200 dark:border-green-800">
                     <span class="material-icons-round text-xs mr-1">check_circle</span>
@@ -80,107 +106,221 @@
             </div>
         </div>
 
-        <!-- DASHBOARD CONTENT -->
-        <div id="dashboard" class="hidden space-y-8 animate-fade-in">
+        <!-- DASHBOARD (Hidden until file loaded) -->
+        <div id="dashboard" class="hidden space-y-6 animate-fade-in">
             
-            <!-- STATS CARDS -->
+            <!-- GLOBAL STATS -->
             <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
-                <!-- Card 1: Load -->
-                <div class="bg-white dark:bg-slate-800 rounded-xl p-6 shadow-sm border border-slate-100 dark:border-slate-700 relative overflow-hidden group hover:shadow-md transition-shadow">
-                    <div class="absolute right-0 top-0 p-4 opacity-10 group-hover:opacity-20 transition-opacity">
-                        <span class="material-icons-round text-6xl text-blue-500">inventory_2</span>
+                <!-- Card 1: TOTAL -->
+                <div class="bg-white dark:bg-slate-800 rounded-xl p-6 shadow-sm border border-slate-100 dark:border-slate-700 flex items-center gap-4">
+                    <div class="p-3 bg-slate-100 dark:bg-slate-700 text-slate-600 dark:text-slate-300 rounded-lg">
+                        <span class="material-icons-round text-2xl">grid_view</span>
                     </div>
-                    <div class="relative z-10">
-                        <p class="text-sm font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wider mb-1">Rencana Muat</p>
-                        <div class="flex items-baseline gap-2">
-                            <h3 id="cntLoad" class="text-3xl font-bold text-slate-800 dark:text-white">0</h3>
-                            <span class="text-sm font-medium text-blue-600 dark:text-blue-400 bg-blue-100 dark:bg-blue-900/30 px-2 py-0.5 rounded">IDJKT</span>
-                        </div>
-                        <p class="text-xs text-slate-400 mt-2">Total kontainer dimuat</p>
+                    <div>
+                        <p class="text-xs text-slate-500 dark:text-slate-400 uppercase tracking-wide font-semibold">Total Container</p>
+                        <h3 id="cntTotal" class="text-2xl font-bold text-slate-800 dark:text-white">0</h3>
                     </div>
                 </div>
 
-                <!-- Card 2: ROB -->
-                <div class="bg-white dark:bg-slate-800 rounded-xl p-6 shadow-sm border border-slate-100 dark:border-slate-700 relative overflow-hidden group hover:shadow-md transition-shadow">
-                    <div class="absolute right-0 top-0 p-4 opacity-10 group-hover:opacity-20 transition-opacity">
-                        <span class="material-icons-round text-6xl text-orange-500">delete_sweep</span>
+                <!-- Card 2: LOAD -->
+                <div class="bg-white dark:bg-slate-800 rounded-xl p-6 shadow-sm border border-slate-100 dark:border-slate-700 flex items-center gap-4 border-l-4 border-l-blue-500">
+                    <div class="p-3 bg-blue-50 dark:bg-blue-900/20 text-blue-600 rounded-lg">
+                        <span class="material-icons-round text-2xl">arrow_circle_up</span>
                     </div>
-                    <div class="relative z-10">
-                        <p class="text-sm font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wider mb-1">ROB (Exluded)</p>
-                        <div class="flex items-baseline gap-2">
-                            <h3 id="cntRob" class="text-3xl font-bold text-slate-800 dark:text-white">0</h3>
-                            <span class="text-sm font-medium text-orange-600 dark:text-orange-400 bg-orange-100 dark:bg-orange-900/30 px-2 py-0.5 rounded">Transit</span>
-                        </div>
-                        <p class="text-xs text-slate-400 mt-2">Kontainer non-Jakarta</p>
+                    <div>
+                        <p class="text-xs text-slate-500 dark:text-slate-400 uppercase tracking-wide font-semibold">Load (Export)</p>
+                        <h3 id="cntLoad" class="text-2xl font-bold text-slate-800 dark:text-white">0</h3>
+                        <p class="text-[10px] text-slate-400">POL: IDJKT</p>
                     </div>
                 </div>
 
-                <!-- Card 3: Type Breakdown -->
-                <div class="bg-white dark:bg-slate-800 rounded-xl p-6 shadow-sm border border-slate-100 dark:border-slate-700 relative overflow-hidden group hover:shadow-md transition-shadow">
-                    <div class="relative z-10 h-full flex flex-col">
-                        <div class="flex justify-between items-center mb-3">
-                            <p class="text-sm font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wider">DETAIL ISO</p>
-                            <span class="material-icons-round text-slate-300 text-xl">category</span>
-                        </div>
-                        <div id="typeList" class="flex-grow overflow-y-auto max-h-[80px] space-y-2 pr-2 custom-scrollbar">
-                            <span class="text-sm text-slate-400 italic">Menunggu data...</span>
-                        </div>
+                <!-- Card 3: DISCHARGE -->
+                <div class="bg-white dark:bg-slate-800 rounded-xl p-6 shadow-sm border border-slate-100 dark:border-slate-700 flex items-center gap-4">
+                    <div class="p-3 bg-orange-50 dark:bg-orange-900/20 text-orange-600 rounded-lg">
+                        <span class="material-icons-round text-2xl">arrow_circle_down</span>
+                    </div>
+                    <div>
+                        <p class="text-xs text-slate-500 dark:text-slate-400 uppercase tracking-wide font-semibold">Discharge (Import)</p>
+                        <h3 id="cntDischarge" class="text-2xl font-bold text-slate-800 dark:text-white">0</h3>
+                        <p class="text-[10px] text-slate-400">POD: IDJKT/XXDKT</p>
                     </div>
                 </div>
             </div>
 
-            <!-- TABLE SECTION -->
-            <div class="bg-white dark:bg-slate-800 rounded-xl shadow-sm border border-slate-100 dark:border-slate-700 overflow-hidden">
-                <div class="p-6 border-b border-slate-100 dark:border-slate-700 flex flex-col sm:flex-row sm:items-center justify-between gap-4 bg-slate-50/50 dark:bg-slate-800/50">
+            <!-- TABS NAVIGATION -->
+            <div class="border-b border-slate-200 dark:border-slate-700 mt-6">
+                <nav class="-mb-px flex space-x-8" aria-label="Tabs">
+                    <button id="btnTabMovins" onclick="switchTab('movins')" class="tab-active py-4 px-6 inline-flex items-center gap-2 text-sm transition-all focus:outline-none rounded-t-lg">
+                        <span class="material-icons-round text-lg">transform</span>
+                        MOVINS Converter (Export)
+                    </button>
+                    <button id="btnTabEditor" onclick="switchTab('editor')" class="tab-inactive py-4 px-6 inline-flex items-center gap-2 text-sm transition-all focus:outline-none rounded-t-lg">
+                        <span class="material-icons-round text-lg">edit_note</span>
+                        Baplie Editor (All Data)
+                    </button>
+                </nav>
+            </div>
+
+            <!-- ============================================== -->
+            <!-- TAB CONTENT: MOVINS CONVERTER (Export Focus) -->
+            <!-- ============================================== -->
+            <div id="tabMovinsContent" class="py-6 space-y-8 animate-fade-in">
+                
+                <!-- Info Banner MOVINS -->
+                <div class="bg-blue-50 dark:bg-blue-900/20 border border-blue-100 dark:border-blue-800/50 rounded-lg p-4 flex items-start gap-3">
+                    <span class="material-icons-round text-blue-500 mt-0.5">filter_alt</span>
                     <div>
+                        <h4 class="text-sm font-bold text-blue-800 dark:text-blue-300">MOVINS Export Filter</h4>
+                        <p class="text-sm text-blue-700 dark:text-blue-400 mt-1">
+                            This tab specifically displays **LOAD / EXPORT** data (POL Jakarta). Use this tab to generate MOVINS files.
+                        </p>
+                    </div>
+                </div>
+
+                <!-- TABLE: MOVINS POD -->
+                <div class="bg-white dark:bg-slate-800 rounded-xl shadow-sm border border-slate-100 dark:border-slate-700 overflow-hidden">
+                    <div class="p-6 border-b border-slate-100 dark:border-slate-700 bg-slate-50/50 dark:bg-slate-800/50">
                         <h3 class="text-lg font-bold text-slate-800 dark:text-white flex items-center gap-2">
                             <span class="material-icons-round text-blue-500">edit_location_alt</span>
-                            Detail and Port Code Management (SPOD)
+                            Export POD Management
                         </h3>
-                        <p class="text-sm text-slate-500 dark:text-slate-400">Kalo ada yg mau dirubah, bisa langsung ganti SPOD nya disini.</p>
+                    </div>
+                    <div class="overflow-x-auto">
+                        <!-- Added table-fixed and percentage widths -->
+                        <table class="w-full text-left border-collapse table-fixed">
+                            <thead>
+                                <tr class="bg-slate-50 dark:bg-slate-700/50 border-b border-slate-200 dark:border-slate-700 text-xs uppercase tracking-wider text-slate-500 dark:text-slate-400">
+                                    <th class="px-6 py-4 font-semibold w-[25%]">Destination (POD)</th>
+                                    <th class="px-6 py-4 font-semibold text-center w-[15%]">Count</th>
+                                    <th class="px-16 py-4 font-semibold w-[15%]">Change To</th>
+                                    <th class="px-9 py-4 font-semibold text-right w-[25%]">Action</th>
+                                </tr>
+                            </thead>
+                            <tbody id="tblMovinsPodBody" class="divide-y divide-slate-100 dark:divide-slate-700 text-sm"></tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <!-- TABLE: MOVINS ISO -->
+                <div class="bg-white dark:bg-slate-800 rounded-xl shadow-sm border border-slate-100 dark:border-slate-700 overflow-hidden">
+                    <div class="p-6 border-b border-slate-100 dark:border-slate-700 bg-slate-50/50 dark:bg-slate-800/50">
+                        <h3 class="text-lg font-bold text-slate-800 dark:text-white flex items-center gap-2">
+                            <span class="material-icons-round text-indigo-500">local_shipping</span>
+                            Export ISO Management
+                        </h3>
+                    </div>
+                    <div class="overflow-x-auto">
+                        <!-- Added table-fixed and percentage widths -->
+                        <table class="w-full text-left border-collapse table-fixed">
+                            <thead>
+                                <tr class="bg-slate-50 dark:bg-slate-700/50 border-b border-slate-200 dark:border-slate-700 text-xs uppercase tracking-wider text-slate-500 dark:text-slate-400">
+                                    <th class="px-6 py-4 font-semibold w-[25%]">ISO Code</th>
+                                    <th class="px-6 py-4 font-semibold text-center w-[15%]">Count</th>
+                                    <th class="px-16 py-4 font-semibold w-[15%]">Change To</th>
+                                    <th class="px-9 py-4 font-semibold text-right w-[25%]">Action</th>
+                                </tr>
+                            </thead>
+                            <tbody id="tblMovinsIsoBody" class="divide-y divide-slate-100 dark:divide-slate-700 text-sm"></tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+            <!-- ============================================== -->
+            <!-- TAB CONTENT: BAPLIE DISCHARGE EDITOR (All Data) -->
+            <!-- ============================================== -->
+            <div id="tabEditorContent" class="hidden py-6 space-y-8 animate-fade-in">
+                
+                <!-- Info Banner Editor -->
+                <div class="bg-indigo-50 dark:bg-indigo-900/20 border border-indigo-100 dark:border-indigo-800/50 rounded-lg p-4 flex items-start gap-3">
+                    <span class="material-icons-round text-indigo-500 mt-0.5">info</span>
+                    <div>
+                        <h4 class="text-sm font-bold text-indigo-800 dark:text-indigo-300">Editor Mode (All Data)</h4>
+                        <p class="text-sm text-indigo-700 dark:text-indigo-400 mt-1">
+                            This tab displays **ALL** containers (Load, Discharge, Transit). Use this tab if you want to download the complete edited BAPLIE file.
+                        </p>
+                    </div>
+                </div>
+
+                <!-- TABLE: EDITOR POD -->
+                <div class="bg-white dark:bg-slate-800 rounded-xl shadow-sm border border-slate-100 dark:border-slate-700 overflow-hidden">
+                    <div class="p-6 border-b border-slate-100 dark:border-slate-700 bg-slate-50/50 dark:bg-slate-800/50">
+                        <h3 class="text-lg font-bold text-slate-800 dark:text-white flex items-center gap-2">
+                            <span class="material-icons-round text-blue-500">edit_location_alt</span>
+                            Global POD Editor
+                        </h3>
+                    </div>
+                    <div class="overflow-x-auto">
+                        <!-- Added table-fixed and percentage widths -->
+                        <table class="w-full text-left border-collapse table-fixed">
+                            <thead>
+                                <tr class="bg-slate-50 dark:bg-slate-700/50 border-b border-slate-200 dark:border-slate-700 text-xs uppercase tracking-wider text-slate-500 dark:text-slate-400">
+                                    <th class="px-6 py-4 font-semibold w-[25%]">Destination (Original)</th>
+                                    <th class="px-6 py-4 font-semibold text-center w-[15%]">Count</th>
+                                    <th class="px-16 py-4 font-semibold w-[15%]">Change To</th>
+                                    <th class="px-9 py-4 font-semibold text-right w-[25%]">Action</th>
+                                </tr>
+                            </thead>
+                            <tbody id="tblEditorPodBody" class="divide-y divide-slate-100 dark:divide-slate-700 text-sm"></tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <!-- TABLE: EDITOR ISO -->
+                <div class="bg-white dark:bg-slate-800 rounded-xl shadow-sm border border-slate-100 dark:border-slate-700 overflow-hidden">
+                    <div class="p-6 border-b border-slate-100 dark:border-slate-700 bg-slate-50/50 dark:bg-slate-800/50">
+                        <h3 class="text-lg font-bold text-slate-800 dark:text-white flex items-center gap-2">
+                            <span class="material-icons-round text-indigo-500">local_shipping</span>
+                            Global ISO Code Editor
+                        </h3>
+                    </div>
+                    <div class="overflow-x-auto">
+                        <!-- Added table-fixed and percentage widths -->
+                        <table class="w-full text-left border-collapse table-fixed">
+                            <thead>
+                                <tr class="bg-slate-50 dark:bg-slate-700/50 border-b border-slate-200 dark:border-slate-700 text-xs uppercase tracking-wider text-slate-500 dark:text-slate-400">
+                                    <th class="px-6 py-4 font-semibold w-[25%]">ISO Code</th>
+                                    <th class="px-6 py-4 font-semibold text-center w-[15%]">Count</th>
+                                    <th class="px-16 py-4 font-semibold w-[15%]">Change To</th>
+                                    <th class="px-9 py-4 font-semibold text-right w-[25%]">Action</th>
+                                </tr>
+                            </thead>
+                            <tbody id="tblEditorIsoBody" class="divide-y divide-slate-100 dark:divide-slate-700 text-sm"></tbody>
+                        </table>
                     </div>
                 </div>
                 
-                <div class="overflow-x-auto">
-                    <table class="w-full text-left border-collapse">
-                        <thead>
-                            <tr class="bg-slate-50 dark:bg-slate-700/50 border-b border-slate-200 dark:border-slate-700 text-xs uppercase tracking-wider text-slate-500 dark:text-slate-400">
-                                <th class="px-6 py-4 font-semibold">Tujuan Saat Ini</th>
-                                <th class="px-6 py-4 font-semibold text-center">Jumlah Box</th>
-                                <th class="px-9 py-4 font-semibold">Ubah Menjadi</th>
-                                <th class="px-7 py-4 font-semibold text-right">Cuss Klik</th>
-                            </tr>
-                        </thead>
-                        <tbody id="tblPodBody" class="divide-y divide-slate-100 dark:divide-slate-700 text-sm"></tbody>
-                    </table>
-                </div>
-                <div class="p-4 bg-blue-50/30 dark:bg-blue-900/10 text-center text-xs text-slate-500 dark:text-slate-400">
-                    💡 Tips: Masukkan kode POD baru (contoh: THLCH) lalu klik tombol <strong>Update</strong>.
-                </div>
+                <div class="h-10"></div>
             </div>
         </div>
     </main>
 
-    <!-- STICKY FOOTER -->
-    <div id="stickyFooter" class="hidden fixed bottom-0 left-0 right-0 bg-white/90 dark:bg-slate-800/90 backdrop-blur-md border-t border-slate-200 dark:border-slate-700 shadow-[0_-4px_6px_-1px_rgba(0,0,0,0.1)] z-50 transition-all duration-300">
-        <div class="container mx-auto px-4 py-4 max-w-6xl flex flex-col md:flex-row items-center justify-between gap-4">
+    <!-- STICKY FOOTER (SMART) -->
+    <div id="stickyFooter" class="hidden fixed bottom-0 left-0 right-0 bg-white/95 dark:bg-slate-800/95 backdrop-blur-md border-t border-slate-200 dark:border-slate-700 shadow-[0_-4px_6px_-1px_rgba(0,0,0,0.1)] z-50 transition-all duration-300">
+        <div class="container mx-auto px-4 py-4 max-w-6xl flex flex-col sm:flex-row items-center justify-between gap-4">
             
-            <div class="flex items-center gap-3 w-full md:w-auto">
-                <div class="flex items-center gap-2 text-sm text-slate-600 dark:text-slate-400 bg-slate-50 dark:bg-slate-900 px-3 py-2 rounded-lg border border-slate-100 dark:border-slate-700 w-full">
-                    <span class="material-icons-round text-lg text-slate-400 flex-shrink-0">description</span>
-                    <span class="whitespace-nowrap flex-shrink-0">Output File:</span>
-                    <input type="text" id="outFileNameInput" 
-                        class="bg-transparent border-none p-0 text-slate-900 dark:text-slate-200 font-mono font-bold text-sm w-full focus:ring-0 focus:outline-none placeholder-slate-400"
-                        placeholder="MOVINS_RESULT.edi">
-                    <span class="material-icons-round text-slate-400 text-xs cursor-pointer hover:text-blue-500">edit</span>
-                </div>
+            <!-- Filename Input -->
+            <div class="flex items-center gap-2 text-sm text-slate-600 dark:text-slate-400 bg-slate-50 dark:bg-slate-900 px-4 py-3 rounded-lg border border-slate-200 dark:border-slate-700 w-full sm:w-1/3 shadow-inner">
+                <span class="material-icons-round text-lg text-slate-400 flex-shrink-0">description</span>
+                <input type="text" id="outFileNameInput" 
+                    class="bg-transparent border-none p-0 text-slate-900 dark:text-slate-200 font-mono font-bold text-sm w-full focus:ring-0 focus:outline-none placeholder-slate-400"
+                    placeholder="RESULT.edi">
             </div>
             
-            <button onclick="downloadFile()" class="group relative inline-flex items-center justify-center gap-2 px-8 py-3 font-semibold text-white transition-all duration-200 bg-gradient-to-r from-green-500 to-emerald-600 rounded-full hover:from-green-600 hover:to-emerald-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500 shadow-lg shadow-green-500/30 hover:shadow-green-500/50 w-full md:w-auto">
+            <!-- Dynamic Button Container -->
+            <div class="w-full sm:w-auto">
+                <!-- Button for MOVINS Tab -->
+                <button id="btnDownloadMovins" onclick="downloadMovins()" class="group relative inline-flex items-center justify-center gap-2 px-8 py-3 font-semibold text-white transition-all duration-200 bg-gradient-to-r from-green-500 to-emerald-600 rounded-full hover:from-green-600 hover:to-emerald-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500 shadow-lg shadow-green-500/30 hover:shadow-green-500/50 w-full md:w-auto">
                 <span class="material-icons-round">save_alt</span>
-                <span>Convert & Download</span>
-                <div class="absolute inset-0 rounded-full ring-2 ring-white/20 group-hover:ring-white/40 transition-all"></div>
-            </button>
+                    <span>CONVERT & DOWNLOAD MOVINS</span>
+                </button>
+
+                <!-- Button for Editor Tab (Hidden by default) -->
+                <button id="btnDownloadBaplie" onclick="downloadBaplie()" class="hidden group relative flex items-center justify-center gap-2 px-8 py-3 font-bold text-white transition-all duration-200 bg-indigo-600 rounded-full hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 shadow-lg shadow-indigo-500/30 hover:shadow-indigo-500/50 w-full">
+                    <span class="material-icons-round">save</span>
+                    <span>DOWNLOAD BAPLIE</span>
+                </button>
+            </div>
         </div>
     </div>
 
@@ -194,18 +334,57 @@
             document.documentElement.classList.add('dark');
         }
 
-        // --- CORE LOGIC V14 (SMART DETECT) ---
+        // --- TAB SYSTEM WITH SMART FOOTER ---
+        function switchTab(tabName) {
+            const contentMovins = document.getElementById('tabMovinsContent');
+            const contentEditor = document.getElementById('tabEditorContent');
+            const btnMovins = document.getElementById('btnTabMovins');
+            const btnEditor = document.getElementById('btnTabEditor');
+            
+            // Footer Buttons
+            const btnFooterMovins = document.getElementById('btnDownloadMovins');
+            const btnFooterBaplie = document.getElementById('btnDownloadBaplie');
+
+            if(tabName === 'movins') {
+                contentMovins.classList.remove('hidden');
+                contentEditor.classList.add('hidden');
+                
+                btnMovins.classList.replace('tab-inactive', 'tab-active');
+                btnEditor.classList.replace('tab-active', 'tab-inactive');
+                
+                // Show MOVINS Button
+                btnFooterMovins.classList.remove('hidden');
+                btnFooterMovins.classList.add('flex');
+                btnFooterBaplie.classList.add('hidden');
+                btnFooterBaplie.classList.remove('flex');
+                
+            } else {
+                contentMovins.classList.add('hidden');
+                contentEditor.classList.remove('hidden');
+                
+                btnMovins.classList.replace('tab-active', 'tab-inactive');
+                btnEditor.classList.replace('tab-inactive', 'tab-active');
+                
+                // Show BAPLIE Button
+                btnFooterBaplie.classList.remove('hidden');
+                btnFooterBaplie.classList.add('flex');
+                btnFooterMovins.classList.add('hidden');
+                btnFooterMovins.classList.remove('flex');
+            }
+        }
+
+        // --- CORE LOGIC V2.8 ---
         let globalData = [];
         let headerLines = [];
         let footerLines = [];
         let vesselName = "VESSEL";
         let voyageNo = "0000";
-        let detectedVersion = "Unknown";
 
         const fileInput = document.getElementById('fileInput');
         const labelFile = document.getElementById('labelFile');
         const versionIndicator = document.getElementById('versionIndicator');
         const versionText = document.getElementById('versionText');
+        const stickyFooter = document.getElementById('stickyFooter');
 
         fileInput.addEventListener('change', function() {
             if(this.files.length > 0) {
@@ -220,21 +399,20 @@
 
         function processFile(txt) {
             globalData = []; headerLines = []; footerLines = [];
-            let rob = 0; 
-            let typeCounts = {}; 
+            let stats = { load: 0, discharge: 0, rob: 0 };
+            let detectedVersion = "Unknown";
             
-            // 1. Detect Version based on content
+            // Version Detection
             if (txt.includes("SMDG15") || txt.includes("LOC+6+")) {
-                detectedVersion = "BAPLIE 1.5 (SMDG15)";
-                versionText.parentElement.classList.replace("bg-green-100", "bg-purple-100"); // Different color for older ver
+                detectedVersion = "BAPLIE 1.5";
+                versionText.parentElement.classList.replace("bg-green-100", "bg-purple-100"); 
                 versionText.parentElement.classList.replace("text-green-800", "text-purple-800");
             } else {
-                detectedVersion = "BAPLIE 2.x (SMDG20+)";
+                detectedVersion = "BAPLIE 2.x";
                 versionText.parentElement.classList.replace("bg-purple-100", "bg-green-100");
                 versionText.parentElement.classList.replace("text-purple-800", "text-green-800");
             }
-            
-            versionText.innerText = "Terdeteksi: " + detectedVersion;
+            versionText.innerText = detectedVersion;
             versionIndicator.classList.remove('hidden');
 
             let segments = txt.replace(/\r?\n|\r/g, "").split("'");
@@ -248,19 +426,9 @@
                     if(s.startsWith("TDT")) {
                         let p = s.split("+");
                         if(p.length>2) voyageNo = p[2];
-                        // Handle TDT variations
                         if(p.length>8 && p[8].includes(":::")) vesselName = p[8].split(":::")[1];
-                        else if(p.length>4 && p[4].includes(":::")) vesselName = p[4].split(":::")[1]; // Fallback for some SMDG15
-                        else if(p.length>8 && p[8] && !p[8].includes(":")) vesselName = p[8]; // Simple name
-                    }
-                    
-                    // HEADER NORMALIZATION
-                    // Ensure output is always SMDG20 regardless of input
-                    if(s.startsWith("UNH")) {
-                        s = s.replace("BAPLIE","MOVINS")
-                             .replace("SMDG15", "SMDG20") // Upgrade v1.5 header
-                             .replace("SMDG22", "SMDG20") // Downgrade v2.2 to standard
-                             .replace("SMDG21", "SMDG20");
+                        else if(p.length>4 && p[4].includes(":::")) vesselName = p[4].split(":::")[1];
+                        else if(p.length>8 && p[8] && !p[8].includes(":")) vesselName = p[8];
                     }
                     if(!s.startsWith("LOC+147")) headerLines.push(s);
                 }
@@ -279,136 +447,215 @@
 
             function parseSlot(segs) {
                 let full = segs.join("'");
-                
-                // SMART FILTER: Check POL IDJKT (Handle LOC+9 (v2) and LOC+6 (v1.5))
-                let isJakarta = false;
-                if(full.includes("LOC+9+IDJKT")) isJakarta = true;
-                if(full.includes("LOC+6+IDJKT")) isJakarta = true; // Support v1.5
-
-                if(!isJakarta) { rob++; return; }
-                
                 let slot="", pod="", type="UNK", w=0;
+                
                 segs.forEach(line => {
                     if(line.startsWith("LOC+147")) slot = line.split("+")[1].split(":")[0].trim();
-                    
-                    // SMART PARSE POD: Handle LOC+11 (v2) and LOC+12 (v1.5)
                     if(line.startsWith("LOC+11")) pod = line.split("+")[2];
-                    if(line.startsWith("LOC+12")) pod = line.split("+")[2]; // Support v1.5
-
-                    if(line.startsWith("EQD+CN")) type = line.split("+")[3] || "UNK";
+                    if(line.startsWith("LOC+12")) pod = line.split("+")[2]; 
+                    if(line.startsWith("EQD+CN")) {
+                        let parts = line.split("+");
+                        if(parts.length > 3) type = parts[3].split(":")[0]; 
+                    }
                     if(line.startsWith("MEA+WT")) w = parseInt(line.split(":")[1]) || 0;
                 });
-                
-                globalData.push({ raw: segs, slot, pod, type, weight: w });
-                typeCounts[type] = (typeCounts[type] || 0) + 1;
+
+                let isLoad = full.includes("LOC+9+IDJKT") || full.includes("LOC+6+IDJKT") || full.includes("LOC+9+IDCRP");
+                let isDischarge = pod.includes("IDJKT") || pod.includes("XXDKT") || pod.includes("IDDKT") || pod.includes("IDCRP");
+
+                if(isLoad) stats.load++;
+                else if(isDischarge) stats.discharge++;
+                else stats.rob++;
+
+                globalData.push({ raw: segs, slot, pod, type, weight: w, isLoad: isLoad });
             }
 
-            // UPDATE UI STATS
-            document.getElementById('cntLoad').innerText = globalData.length;
-            document.getElementById('cntRob').innerText = rob;
+            document.getElementById('cntTotal').innerText = globalData.length;
+            document.getElementById('cntLoad').innerText = stats.load;
+            document.getElementById('cntDischarge').innerText = stats.discharge;
             
-            // Render Type List
-            let typeHtml = "";
-            for(let [type, count] of Object.entries(typeCounts)) {
-                typeHtml += `
-                <div class="flex justify-between items-center text-sm py-1 border-b border-dashed border-slate-100 dark:border-slate-700 last:border-0">
-                    <span class="font-mono text-slate-600 dark:text-slate-400 bg-slate-100 dark:bg-slate-700 px-2 rounded text-xs">${type}</span>
-                    <strong class="text-slate-800 dark:text-slate-200">${count} <span class="text-xs font-normal text-slate-400">Box</span></strong>
-                </div>`;
-            }
-            document.getElementById('typeList').innerHTML = typeHtml || '<span class="text-sm text-slate-400 italic">Tidak ada data</span>';
-
             let safeVessel = vesselName ? vesselName.replace(/[^a-zA-Z0-9]/g, "_") : "VESSEL";
-            document.getElementById('outFileNameInput').value = `MOVINS_${safeVessel}_${voyageNo}.edi`;
+            document.getElementById('outFileNameInput').value = `${safeVessel}_${voyageNo}.edi`;
 
             document.getElementById('dashboard').classList.remove('hidden');
-            document.getElementById('stickyFooter').classList.remove('hidden');
+            stickyFooter.classList.remove('hidden');
             
-            renderTable();
+            renderAllTables();
         }
 
-        function renderTable() {
-            let grp = {};
-            globalData.forEach(d => grp[d.pod] = (grp[d.pod]||0)+1);
-            let tbody = document.getElementById('tblPodBody');
-            tbody.innerHTML = "";
+        function renderAllTables() {
+            // MOVINS TAB (Load Only)
+            renderGenericTable(
+                globalData.filter(d => d.isLoad), 
+                'tblMovinsPodBody', 
+                'tblMovinsIsoBody', 
+                'mov'
+            );
             
-            for(let [p,c] of Object.entries(grp)) {
+            // EDITOR TAB (All Data)
+            renderGenericTable(
+                globalData, 
+                'tblEditorPodBody', 
+                'tblEditorIsoBody', 
+                'edt'
+            );
+        }
+
+        function renderGenericTable(dataSource, podTbodyId, isoTbodyId, idPrefix) {
+            // 1. POD Table
+            let grpPod = {};
+            dataSource.forEach(d => grpPod[d.pod] = (grpPod[d.pod]||0)+1);
+            let tbodyPod = document.getElementById(podTbodyId);
+            tbodyPod.innerHTML = "";
+            
+            for(let [p,c] of Object.entries(grpPod)) {
                 let row = `
-                <tr class="border-b border-slate-100 dark:border-slate-700 hover:bg-slate-50 dark:hover:bg-slate-700/50 transition-colors">
-                    <td class="px-6 py-4 font-medium text-slate-900 dark:text-slate-100">
+                <tr class="border-b border-slate-100 dark:border-slate-700 hover:bg-slate-50 dark:hover:bg-slate-700/50">
+                    <td class="px-6 py-4 font-medium text-slate-900 dark:text-slate-100 break-words">
                         <span class="bg-blue-50 dark:bg-blue-900/20 text-blue-600 dark:text-blue-400 px-2 py-1 rounded font-mono font-bold">${p}</span>
                     </td>
                     <td class="px-6 py-4 text-center">
-                        <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-slate-100 dark:bg-slate-700 text-slate-800 dark:text-slate-200">${c} Box</span>
+                        <span class="bg-slate-100 dark:bg-slate-700 text-slate-800 dark:text-slate-200 text-sm px-3 py-1 rounded-full font-medium">${c} Box</span>
                     </td>
                     <td class="px-6 py-4">
-                        <input id="in-${p}" type="text" value="${p}" class="w-32 bg-white dark:bg-slate-900 border border-slate-300 dark:border-slate-600 text-slate-900 dark:text-white text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block p-2 text-center uppercase font-bold font-mono shadow-sm" placeholder="NEW POD">
+                        <input id="in-pod-${idPrefix}-${p}" type="text" value="${p}" class="w-full bg-white dark:bg-slate-900 border border-slate-300 dark:border-slate-600 text-slate-900 dark:text-white text-sm rounded-lg p-2 text-center uppercase font-bold font-mono" placeholder="NEW POD">
                     </td>
                     <td class="px-6 py-4 text-right">
-                        <button onclick="updPod('${p}')" class="text-white bg-blue-600 hover:bg-blue-700 focus:ring-4 focus:ring-blue-300 font-medium rounded-lg text-xs px-4 py-2 dark:bg-blue-600 dark:hover:bg-blue-700 focus:outline-none dark:focus:ring-blue-800 transition-all shadow-md shadow-blue-500/20">Update</button>
+                        <button onclick="updPod('${p}', 'in-pod-${idPrefix}-${p}')" class="text-white bg-blue-600 hover:bg-blue-700 rounded-lg text-xs px-4 py-2 font-bold transition-colors shadow-md shadow-blue-500/20">Update</button>
                     </td>
                 </tr>`;
-                tbody.innerHTML += row;
+                tbodyPod.innerHTML += row;
+            }
+
+            // 2. ISO Table
+            let grpIso = {};
+            dataSource.forEach(d => grpIso[d.type] = (grpIso[d.type]||0)+1);
+            let tbodyIso = document.getElementById(isoTbodyId);
+            tbodyIso.innerHTML = "";
+            
+            for(let [t,c] of Object.entries(grpIso)) {
+                let safeT = t.replace(/[^a-zA-Z0-9]/g, "");
+                let row = `
+                <tr class="border-b border-slate-100 dark:border-slate-700 hover:bg-slate-50 dark:hover:bg-slate-700/50">
+                    <td class="px-6 py-4 font-medium text-slate-900 dark:text-slate-100 break-words">
+                        <span class="bg-indigo-50 dark:bg-indigo-900/20 text-indigo-600 dark:text-indigo-400 px-2 py-1 rounded font-mono font-bold">${t}</span>
+                    </td>
+                    <td class="px-6 py-4 text-center">
+                        <span class="bg-slate-100 dark:bg-slate-700 text-slate-800 dark:text-slate-200 text-sm px-3 py-1 rounded-full font-medium">${c} Box</span>
+                    </td>
+                    <td class="px-6 py-4">
+                        <input id="in-iso-${idPrefix}-${safeT}" type="text" value="${t}" class="w-full bg-white dark:bg-slate-900 border border-slate-300 dark:border-slate-600 text-slate-900 dark:text-white text-sm rounded-lg p-2 text-center uppercase font-bold font-mono" placeholder="NEW ISO">
+                    </td>
+                    <td class="px-6 py-4 text-right">
+                        <button onclick="updIso('${t}', 'in-iso-${idPrefix}-${safeT}')" class="text-white bg-indigo-600 hover:bg-indigo-700 rounded-lg text-xs px-4 py-2 font-bold transition-colors shadow-md shadow-indigo-500/20">Update</button>
+                    </td>
+                </tr>`;
+                tbodyIso.innerHTML += row;
             }
         }
 
-        window.updPod = function(oldP) {
-            let newP = document.getElementById('in-'+oldP).value.toUpperCase().trim();
+        window.updPod = function(oldP, inputId) {
+            let newP = document.getElementById(inputId).value.toUpperCase().trim();
             if(!newP) return;
             let count = 0;
             globalData.forEach(d => { if(d.pod === oldP) { d.pod = newP; count++; } });
-            alert(`Berhasil update ${count} kontainer dari ${oldP} ke ${newP}`);
-            renderTable();
+            alert(`Updated ${count} box (${oldP} -> ${newP})`);
+            renderAllTables();
         }
 
-        window.downloadFile = function() {
+        window.updIso = function(oldIso, inputId) {
+            let newIso = document.getElementById(inputId).value.toUpperCase().trim();
+            if(!newIso) return;
+            let count = 0;
+            globalData.forEach(d => { if(d.type === oldIso) { d.type = newIso; count++; } });
+            alert(`Updated ${count} box (${oldIso} -> ${newIso})`);
+            renderAllTables();
+        }
+
+        // --- DOWNLOAD HANDLERS ---
+        window.downloadBaplie = function() {
             let lines = [];
             let c = 0;
-            
             headerLines.forEach(l => { lines.push(l); if(!l.startsWith("UNB")) c++; });
-            lines.push("HAN+LOA"); c++;
-
             globalData.forEach(d => {
                 let blk = [];
                 d.raw.forEach(orig => {
                     let s = orig;
-                    // REWRITE OUTPUT TO STANDARD MOVINS (SMDG20)
-                    // Even if input was v1.5 (LOC+6/12), output must be v2.0 (LOC+9/11)
-                    
-                    // 1. Convert POD (Input LOC+11 or LOC+12 -> Output LOC+11)
+                    let parts = s.split("+");
                     if(s.startsWith("LOC+11") || s.startsWith("LOC+12")) {
-                        s = `LOC+11+${d.pod}`;
+                        if(parts.length > 2) { parts[2] = d.pod; s = parts.join("+"); }
                     }
-                    // 2. Convert POL (Input LOC+6 -> Output LOC+9)
-                    // Note: We filter by IDJKT, so we can hardcode LOC+9+IDJKT for safety in MOVINS output
-                    if(s.startsWith("LOC+9") || s.startsWith("LOC+6")) {
-                        s = `LOC+9+IDJKT`;
+                    if(s.startsWith("EQD+CN")) {
+                        if(parts.length > 3) { parts[3] = d.type; s = parts.join("+"); }
                     }
-                    
-                    if(s.startsWith("EQD+CN")) { let p=s.split("+"); if(p.length>2) p[2]=""; s=p.join("+"); }
                     blk.push(s);
                 });
                 lines.push(...blk); c += blk.length;
             });
+            finishDownload(lines, c, "BAPLIE_DISCHARGE");
+        }
 
+        window.downloadMovins = function() {
+            let lines = [];
+            let c = 0;
+            headerLines.forEach(l => {
+                let s = l;
+                if(s.startsWith("UNH")) {
+                    s = s.replace("BAPLIE","MOVINS").replace(/SMDG\d+/,"SMDG20");
+                }
+                lines.push(s); 
+                if(!s.startsWith("UNB")) c++; 
+            });
+            lines.push("HAN+LOA"); c++;
+
+            // FILTER ONLY EXPORT/LOAD FOR MOVINS
+            let exportData = globalData.filter(d => d.isLoad);
+
+            exportData.forEach(d => {
+                let blk = [];
+                d.raw.forEach(orig => {
+                    let s = orig;
+                    let parts = s.split("+");
+
+                    if(s.startsWith("LOC+11") || s.startsWith("LOC+12")) { s = `LOC+11+${d.pod}`; }
+                    if(s.startsWith("LOC+9") || s.startsWith("LOC+6")) { s = `LOC+9+IDJKT`; }
+                    if(s.startsWith("EQD+CN")) { 
+                        if(parts.length > 3) parts[3] = d.type; 
+                        if(parts.length > 2) parts[2] = ""; 
+                        s = parts.join("+"); 
+                    }
+                    blk.push(s);
+                });
+                lines.push(...blk); c += blk.length;
+            });
+            finishDownload(lines, c, "MOVINS");
+        }
+
+        function finishDownload(lines, countUNT, prefix) {
             let ref = "1";
             let unh = headerLines.find(x => x.startsWith("UNH"));
             if(unh) ref = unh.split("+")[1];
-            c++;
-            lines.push(`UNT+${c}+${ref}`);
+            countUNT++; 
+            lines.push(`UNT+${countUNT}+${ref}`);
             
             if(footerLines.length) lines.push(footerLines[0]);
             else lines.push("UNZ+1+1");
 
             let blob = new Blob([lines.join("'\n")+"'\n"], {type:"application/octet-stream"});
             let url = URL.createObjectURL(blob);
-            let name = document.getElementById('outFileNameInput').value.trim();
-            if(!name) name = "MOVINS_RESULT.edi";
-            if(!name.toLowerCase().endsWith(".edi")) name += ".edi";
+            let userFilename = document.getElementById('outFileNameInput').value.trim();
             
+            let finalName = userFilename;
+            if(!finalName) finalName = `${prefix}_${vesselName}_${voyageNo}.edi`;
+            if(!finalName.toLowerCase().endsWith(".edi")) finalName += ".edi";
+            
+            if(userFilename === "") {
+                if(prefix === "BAPLIE_DISCHARGE") finalName = "BAPLIE_DISCHARGE_" + finalName;
+                else if(prefix === "MOVINS") finalName = "MOVINS_" + finalName;
+            }
+
             let a = document.createElement('a');
-            a.href = url; a.download = name;
+            a.href = url; a.download = finalName;
             document.body.appendChild(a); a.click(); document.body.removeChild(a);
         }
     </script>
