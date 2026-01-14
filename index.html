@@ -1,0 +1,416 @@
+<!DOCTYPE html>
+<html lang="id" class="scroll-smooth">
+<head>
+    <meta charset="utf-8"/>
+    <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+    <title>NPCT1 PLANNING - BAPLIE TO MOVINS CONVERTER - Smart Detect Version</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com?plugins=forms,typography"></script>
+    <!-- Fonts & Icons -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&amp;display=swap" rel="stylesheet"/>
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons+Round" rel="stylesheet"/>
+    
+    <script>
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    fontFamily: { sans: ["Inter", "sans-serif"] },
+                    colors: {
+                        primary: { 50:"#eff6ff", 100:"#dbeafe", 500:"#3b82f6", 600:"#2563eb", 700:"#1d4ed8" }
+                    }
+                },
+            },
+        };
+    </script>
+    <style>
+        ::-webkit-scrollbar { width: 8px; height: 8px; }
+        ::-webkit-scrollbar-track { background: transparent; }
+        ::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 4px; }
+        .dark ::-webkit-scrollbar-thumb { background: #475569; }
+        ::-webkit-scrollbar-thumb:hover { background: #94a3b8; }
+    </style>
+</head>
+<body class="bg-slate-50 dark:bg-slate-900 text-slate-800 dark:text-slate-200 transition-colors duration-300 font-sans min-h-screen flex flex-col relative pb-24">
+
+    <!-- HEADER -->
+    <header class="sticky top-0 z-40 w-full backdrop-blur-lg bg-white/80 dark:bg-slate-900/80 border-b border-slate-200 dark:border-slate-800">
+        <div class="container mx-auto px-4 h-16 flex items-center justify-between max-w-6xl">
+            <div class="flex items-center gap-3">
+                <div class="bg-gradient-to-br from-blue-500 to-indigo-600 text-white p-2 rounded-lg shadow-lg shadow-blue-500/30">
+                    <span class="material-icons-round text-xl">directions_boat</span>
+                </div>
+                <div>
+                    <h1 class="text-lg font-bold bg-clip-text text-transparent bg-gradient-to-r from-slate-900 to-slate-600 dark:from-white dark:to-slate-400">
+                        NPCT1 PLANNING - BAPLIE TO MOVINS CONVERTER
+                    </h1>
+                    <p class="text-xs text-slate-500 dark:text-slate-400 font-medium">Smart Detect Version - Skuy Gasskeuun</p>
+                </div>
+            </div>
+            <button onclick="toggleDarkMode()" class="p-2 rounded-full hover:bg-slate-100 dark:hover:bg-slate-800 text-slate-500 transition-all focus:outline-none focus:ring-2 focus:ring-blue-500">
+                <span class="material-icons-round dark:hidden">dark_mode</span>
+                <span class="material-icons-round hidden dark:block text-yellow-400">light_mode</span>
+            </button>
+        </div>
+    </header>
+
+    <main class="flex-grow container mx-auto px-4 py-8 max-w-6xl">
+        
+        <!-- UPLOAD SECTION -->
+        <div class="mb-10 animate-fade-in-up">
+            <label for="fileInput" class="group relative flex flex-col items-center justify-center w-full h-48 border-2 border-dashed border-slate-300 dark:border-slate-600 rounded-2xl bg-white dark:bg-slate-800 hover:bg-blue-50 dark:hover:bg-slate-700/50 hover:border-blue-400 dark:hover:border-blue-500 transition-all cursor-pointer overflow-hidden shadow-sm hover:shadow-md">
+                <div class="flex flex-col items-center justify-center pt-5 pb-6 z-10">
+                    <div class="p-3 bg-blue-50 dark:bg-slate-700 rounded-full mb-3 group-hover:scale-110 transition-transform duration-300">
+                        <span class="material-icons-round text-3xl text-blue-500 dark:text-blue-400">cloud_upload</span>
+                    </div>
+                    <p class="mb-1 text-sm text-slate-600 dark:text-slate-300 font-medium group-hover:text-blue-600 dark:group-hover:text-blue-400">
+                        <span id="labelFile">Klik untuk memilih file PRE MOVINS (.edi)</span>
+                    </p>
+                    <p class="text-xs text-slate-400 dark:text-slate-500">Mendukung BAPLIE v1.5 (SMDG15) & v2.x (SMDG20+)</p>
+                </div>
+                <input id="fileInput" type="file" class="hidden" accept=".edi,.txt" />
+            </label>
+            
+            <!-- Version Indicator -->
+            <div id="versionIndicator" class="hidden mt-2 text-center">
+                <span class="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-400 border border-green-200 dark:border-green-800">
+                    <span class="material-icons-round text-xs mr-1">check_circle</span>
+                    <span id="versionText">Detected: SMDG20</span>
+                </span>
+            </div>
+        </div>
+
+        <!-- DASHBOARD CONTENT -->
+        <div id="dashboard" class="hidden space-y-8 animate-fade-in">
+            
+            <!-- STATS CARDS -->
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                <!-- Card 1: Load -->
+                <div class="bg-white dark:bg-slate-800 rounded-xl p-6 shadow-sm border border-slate-100 dark:border-slate-700 relative overflow-hidden group hover:shadow-md transition-shadow">
+                    <div class="absolute right-0 top-0 p-4 opacity-10 group-hover:opacity-20 transition-opacity">
+                        <span class="material-icons-round text-6xl text-blue-500">inventory_2</span>
+                    </div>
+                    <div class="relative z-10">
+                        <p class="text-sm font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wider mb-1">Rencana Muat</p>
+                        <div class="flex items-baseline gap-2">
+                            <h3 id="cntLoad" class="text-3xl font-bold text-slate-800 dark:text-white">0</h3>
+                            <span class="text-sm font-medium text-blue-600 dark:text-blue-400 bg-blue-100 dark:bg-blue-900/30 px-2 py-0.5 rounded">IDJKT</span>
+                        </div>
+                        <p class="text-xs text-slate-400 mt-2">Total kontainer dimuat</p>
+                    </div>
+                </div>
+
+                <!-- Card 2: ROB -->
+                <div class="bg-white dark:bg-slate-800 rounded-xl p-6 shadow-sm border border-slate-100 dark:border-slate-700 relative overflow-hidden group hover:shadow-md transition-shadow">
+                    <div class="absolute right-0 top-0 p-4 opacity-10 group-hover:opacity-20 transition-opacity">
+                        <span class="material-icons-round text-6xl text-orange-500">delete_sweep</span>
+                    </div>
+                    <div class="relative z-10">
+                        <p class="text-sm font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wider mb-1">ROB (Exluded)</p>
+                        <div class="flex items-baseline gap-2">
+                            <h3 id="cntRob" class="text-3xl font-bold text-slate-800 dark:text-white">0</h3>
+                            <span class="text-sm font-medium text-orange-600 dark:text-orange-400 bg-orange-100 dark:bg-orange-900/30 px-2 py-0.5 rounded">Transit</span>
+                        </div>
+                        <p class="text-xs text-slate-400 mt-2">Kontainer non-Jakarta</p>
+                    </div>
+                </div>
+
+                <!-- Card 3: Type Breakdown -->
+                <div class="bg-white dark:bg-slate-800 rounded-xl p-6 shadow-sm border border-slate-100 dark:border-slate-700 relative overflow-hidden group hover:shadow-md transition-shadow">
+                    <div class="relative z-10 h-full flex flex-col">
+                        <div class="flex justify-between items-center mb-3">
+                            <p class="text-sm font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wider">DETAIL ISO</p>
+                            <span class="material-icons-round text-slate-300 text-xl">category</span>
+                        </div>
+                        <div id="typeList" class="flex-grow overflow-y-auto max-h-[80px] space-y-2 pr-2 custom-scrollbar">
+                            <span class="text-sm text-slate-400 italic">Menunggu data...</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- TABLE SECTION -->
+            <div class="bg-white dark:bg-slate-800 rounded-xl shadow-sm border border-slate-100 dark:border-slate-700 overflow-hidden">
+                <div class="p-6 border-b border-slate-100 dark:border-slate-700 flex flex-col sm:flex-row sm:items-center justify-between gap-4 bg-slate-50/50 dark:bg-slate-800/50">
+                    <div>
+                        <h3 class="text-lg font-bold text-slate-800 dark:text-white flex items-center gap-2">
+                            <span class="material-icons-round text-blue-500">edit_location_alt</span>
+                            Detail and Port Code Management (SPOD)
+                        </h3>
+                        <p class="text-sm text-slate-500 dark:text-slate-400">Kalo ada yg mau dirubah, bisa langsung ganti SPOD nya disini.</p>
+                    </div>
+                </div>
+                
+                <div class="overflow-x-auto">
+                    <table class="w-full text-left border-collapse">
+                        <thead>
+                            <tr class="bg-slate-50 dark:bg-slate-700/50 border-b border-slate-200 dark:border-slate-700 text-xs uppercase tracking-wider text-slate-500 dark:text-slate-400">
+                                <th class="px-6 py-4 font-semibold">Tujuan Saat Ini</th>
+                                <th class="px-6 py-4 font-semibold text-center">Jumlah Box</th>
+                                <th class="px-9 py-4 font-semibold">Ubah Menjadi</th>
+                                <th class="px-7 py-4 font-semibold text-right">Cuss Klik</th>
+                            </tr>
+                        </thead>
+                        <tbody id="tblPodBody" class="divide-y divide-slate-100 dark:divide-slate-700 text-sm"></tbody>
+                    </table>
+                </div>
+                <div class="p-4 bg-blue-50/30 dark:bg-blue-900/10 text-center text-xs text-slate-500 dark:text-slate-400">
+                    💡 Tips: Masukkan kode POD baru (contoh: THLCH) lalu klik tombol <strong>Update</strong>.
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- STICKY FOOTER -->
+    <div id="stickyFooter" class="hidden fixed bottom-0 left-0 right-0 bg-white/90 dark:bg-slate-800/90 backdrop-blur-md border-t border-slate-200 dark:border-slate-700 shadow-[0_-4px_6px_-1px_rgba(0,0,0,0.1)] z-50 transition-all duration-300">
+        <div class="container mx-auto px-4 py-4 max-w-6xl flex flex-col md:flex-row items-center justify-between gap-4">
+            
+            <div class="flex items-center gap-3 w-full md:w-auto">
+                <div class="flex items-center gap-2 text-sm text-slate-600 dark:text-slate-400 bg-slate-50 dark:bg-slate-900 px-3 py-2 rounded-lg border border-slate-100 dark:border-slate-700 w-full">
+                    <span class="material-icons-round text-lg text-slate-400 flex-shrink-0">description</span>
+                    <span class="whitespace-nowrap flex-shrink-0">Output File:</span>
+                    <input type="text" id="outFileNameInput" 
+                        class="bg-transparent border-none p-0 text-slate-900 dark:text-slate-200 font-mono font-bold text-sm w-full focus:ring-0 focus:outline-none placeholder-slate-400"
+                        placeholder="MOVINS_RESULT.edi">
+                    <span class="material-icons-round text-slate-400 text-xs cursor-pointer hover:text-blue-500">edit</span>
+                </div>
+            </div>
+            
+            <button onclick="downloadFile()" class="group relative inline-flex items-center justify-center gap-2 px-8 py-3 font-semibold text-white transition-all duration-200 bg-gradient-to-r from-green-500 to-emerald-600 rounded-full hover:from-green-600 hover:to-emerald-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500 shadow-lg shadow-green-500/30 hover:shadow-green-500/50 w-full md:w-auto">
+                <span class="material-icons-round">save_alt</span>
+                <span>Convert & Download</span>
+                <div class="absolute inset-0 rounded-full ring-2 ring-white/20 group-hover:ring-white/40 transition-all"></div>
+            </button>
+        </div>
+    </div>
+
+    <script>
+        function toggleDarkMode() {
+            document.documentElement.classList.toggle('dark');
+            const isDark = document.documentElement.classList.contains('dark');
+            localStorage.setItem('theme', isDark ? 'dark' : 'light');
+        }
+        if (localStorage.theme === 'dark' || (!('theme' in localStorage) && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
+            document.documentElement.classList.add('dark');
+        }
+
+        // --- CORE LOGIC V14 (SMART DETECT) ---
+        let globalData = [];
+        let headerLines = [];
+        let footerLines = [];
+        let vesselName = "VESSEL";
+        let voyageNo = "0000";
+        let detectedVersion = "Unknown";
+
+        const fileInput = document.getElementById('fileInput');
+        const labelFile = document.getElementById('labelFile');
+        const versionIndicator = document.getElementById('versionIndicator');
+        const versionText = document.getElementById('versionText');
+
+        fileInput.addEventListener('change', function() {
+            if(this.files.length > 0) {
+                let f = this.files[0];
+                labelFile.innerText = f.name;
+                labelFile.classList.add("text-blue-600", "font-bold");
+                let r = new FileReader();
+                r.onload = (e) => processFile(e.target.result);
+                r.readAsText(f);
+            }
+        });
+
+        function processFile(txt) {
+            globalData = []; headerLines = []; footerLines = [];
+            let rob = 0; 
+            let typeCounts = {}; 
+            
+            // 1. Detect Version based on content
+            if (txt.includes("SMDG15") || txt.includes("LOC+6+")) {
+                detectedVersion = "BAPLIE 1.5 (SMDG15)";
+                versionText.parentElement.classList.replace("bg-green-100", "bg-purple-100"); // Different color for older ver
+                versionText.parentElement.classList.replace("text-green-800", "text-purple-800");
+            } else {
+                detectedVersion = "BAPLIE 2.x (SMDG20+)";
+                versionText.parentElement.classList.replace("bg-purple-100", "bg-green-100");
+                versionText.parentElement.classList.replace("text-purple-800", "text-green-800");
+            }
+            
+            versionText.innerText = "Terdeteksi: " + detectedVersion;
+            versionIndicator.classList.remove('hidden');
+
+            let segments = txt.replace(/\r?\n|\r/g, "").split("'");
+            let buffer = [], isSlot = false;
+
+            for(let s of segments) {
+                s = s.trim();
+                if(!s) continue;
+
+                if(s.startsWith("UNH") || s.startsWith("BGM") || s.startsWith("DTM") || s.startsWith("TDT") || s.startsWith("LOC+5") || s.startsWith("UNB")) {
+                    if(s.startsWith("TDT")) {
+                        let p = s.split("+");
+                        if(p.length>2) voyageNo = p[2];
+                        // Handle TDT variations
+                        if(p.length>8 && p[8].includes(":::")) vesselName = p[8].split(":::")[1];
+                        else if(p.length>4 && p[4].includes(":::")) vesselName = p[4].split(":::")[1]; // Fallback for some SMDG15
+                        else if(p.length>8 && p[8] && !p[8].includes(":")) vesselName = p[8]; // Simple name
+                    }
+                    
+                    // HEADER NORMALIZATION
+                    // Ensure output is always SMDG20 regardless of input
+                    if(s.startsWith("UNH")) {
+                        s = s.replace("BAPLIE","MOVINS")
+                             .replace("SMDG15", "SMDG20") // Upgrade v1.5 header
+                             .replace("SMDG22", "SMDG20") // Downgrade v2.2 to standard
+                             .replace("SMDG21", "SMDG20");
+                    }
+                    if(!s.startsWith("LOC+147")) headerLines.push(s);
+                }
+                else if(s.startsWith("UNT") || s.startsWith("UNZ")) {
+                    if(buffer.length) parseSlot(buffer);
+                    buffer = []; isSlot = false;
+                    if(s.startsWith("UNZ")) footerLines.push(s);
+                }
+                else if(s.startsWith("LOC+147")) {
+                    if(buffer.length) parseSlot(buffer);
+                    buffer = [s]; isSlot = true;
+                }
+                else if(isSlot) buffer.push(s);
+            }
+            if(buffer.length) parseSlot(buffer);
+
+            function parseSlot(segs) {
+                let full = segs.join("'");
+                
+                // SMART FILTER: Check POL IDJKT (Handle LOC+9 (v2) and LOC+6 (v1.5))
+                let isJakarta = false;
+                if(full.includes("LOC+9+IDJKT")) isJakarta = true;
+                if(full.includes("LOC+6+IDJKT")) isJakarta = true; // Support v1.5
+
+                if(!isJakarta) { rob++; return; }
+                
+                let slot="", pod="", type="UNK", w=0;
+                segs.forEach(line => {
+                    if(line.startsWith("LOC+147")) slot = line.split("+")[1].split(":")[0].trim();
+                    
+                    // SMART PARSE POD: Handle LOC+11 (v2) and LOC+12 (v1.5)
+                    if(line.startsWith("LOC+11")) pod = line.split("+")[2];
+                    if(line.startsWith("LOC+12")) pod = line.split("+")[2]; // Support v1.5
+
+                    if(line.startsWith("EQD+CN")) type = line.split("+")[3] || "UNK";
+                    if(line.startsWith("MEA+WT")) w = parseInt(line.split(":")[1]) || 0;
+                });
+                
+                globalData.push({ raw: segs, slot, pod, type, weight: w });
+                typeCounts[type] = (typeCounts[type] || 0) + 1;
+            }
+
+            // UPDATE UI STATS
+            document.getElementById('cntLoad').innerText = globalData.length;
+            document.getElementById('cntRob').innerText = rob;
+            
+            // Render Type List
+            let typeHtml = "";
+            for(let [type, count] of Object.entries(typeCounts)) {
+                typeHtml += `
+                <div class="flex justify-between items-center text-sm py-1 border-b border-dashed border-slate-100 dark:border-slate-700 last:border-0">
+                    <span class="font-mono text-slate-600 dark:text-slate-400 bg-slate-100 dark:bg-slate-700 px-2 rounded text-xs">${type}</span>
+                    <strong class="text-slate-800 dark:text-slate-200">${count} <span class="text-xs font-normal text-slate-400">Box</span></strong>
+                </div>`;
+            }
+            document.getElementById('typeList').innerHTML = typeHtml || '<span class="text-sm text-slate-400 italic">Tidak ada data</span>';
+
+            let safeVessel = vesselName ? vesselName.replace(/[^a-zA-Z0-9]/g, "_") : "VESSEL";
+            document.getElementById('outFileNameInput').value = `MOVINS_${safeVessel}_${voyageNo}.edi`;
+
+            document.getElementById('dashboard').classList.remove('hidden');
+            document.getElementById('stickyFooter').classList.remove('hidden');
+            
+            renderTable();
+        }
+
+        function renderTable() {
+            let grp = {};
+            globalData.forEach(d => grp[d.pod] = (grp[d.pod]||0)+1);
+            let tbody = document.getElementById('tblPodBody');
+            tbody.innerHTML = "";
+            
+            for(let [p,c] of Object.entries(grp)) {
+                let row = `
+                <tr class="border-b border-slate-100 dark:border-slate-700 hover:bg-slate-50 dark:hover:bg-slate-700/50 transition-colors">
+                    <td class="px-6 py-4 font-medium text-slate-900 dark:text-slate-100">
+                        <span class="bg-blue-50 dark:bg-blue-900/20 text-blue-600 dark:text-blue-400 px-2 py-1 rounded font-mono font-bold">${p}</span>
+                    </td>
+                    <td class="px-6 py-4 text-center">
+                        <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-slate-100 dark:bg-slate-700 text-slate-800 dark:text-slate-200">${c} Box</span>
+                    </td>
+                    <td class="px-6 py-4">
+                        <input id="in-${p}" type="text" value="${p}" class="w-32 bg-white dark:bg-slate-900 border border-slate-300 dark:border-slate-600 text-slate-900 dark:text-white text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block p-2 text-center uppercase font-bold font-mono shadow-sm" placeholder="NEW POD">
+                    </td>
+                    <td class="px-6 py-4 text-right">
+                        <button onclick="updPod('${p}')" class="text-white bg-blue-600 hover:bg-blue-700 focus:ring-4 focus:ring-blue-300 font-medium rounded-lg text-xs px-4 py-2 dark:bg-blue-600 dark:hover:bg-blue-700 focus:outline-none dark:focus:ring-blue-800 transition-all shadow-md shadow-blue-500/20">Update</button>
+                    </td>
+                </tr>`;
+                tbody.innerHTML += row;
+            }
+        }
+
+        window.updPod = function(oldP) {
+            let newP = document.getElementById('in-'+oldP).value.toUpperCase().trim();
+            if(!newP) return;
+            let count = 0;
+            globalData.forEach(d => { if(d.pod === oldP) { d.pod = newP; count++; } });
+            alert(`Berhasil update ${count} kontainer dari ${oldP} ke ${newP}`);
+            renderTable();
+        }
+
+        window.downloadFile = function() {
+            let lines = [];
+            let c = 0;
+            
+            headerLines.forEach(l => { lines.push(l); if(!l.startsWith("UNB")) c++; });
+            lines.push("HAN+LOA"); c++;
+
+            globalData.forEach(d => {
+                let blk = [];
+                d.raw.forEach(orig => {
+                    let s = orig;
+                    // REWRITE OUTPUT TO STANDARD MOVINS (SMDG20)
+                    // Even if input was v1.5 (LOC+6/12), output must be v2.0 (LOC+9/11)
+                    
+                    // 1. Convert POD (Input LOC+11 or LOC+12 -> Output LOC+11)
+                    if(s.startsWith("LOC+11") || s.startsWith("LOC+12")) {
+                        s = `LOC+11+${d.pod}`;
+                    }
+                    // 2. Convert POL (Input LOC+6 -> Output LOC+9)
+                    // Note: We filter by IDJKT, so we can hardcode LOC+9+IDJKT for safety in MOVINS output
+                    if(s.startsWith("LOC+9") || s.startsWith("LOC+6")) {
+                        s = `LOC+9+IDJKT`;
+                    }
+                    
+                    if(s.startsWith("EQD+CN")) { let p=s.split("+"); if(p.length>2) p[2]=""; s=p.join("+"); }
+                    blk.push(s);
+                });
+                lines.push(...blk); c += blk.length;
+            });
+
+            let ref = "1";
+            let unh = headerLines.find(x => x.startsWith("UNH"));
+            if(unh) ref = unh.split("+")[1];
+            c++;
+            lines.push(`UNT+${c}+${ref}`);
+            
+            if(footerLines.length) lines.push(footerLines[0]);
+            else lines.push("UNZ+1+1");
+
+            let blob = new Blob([lines.join("'\n")+"'\n"], {type:"application/octet-stream"});
+            let url = URL.createObjectURL(blob);
+            let name = document.getElementById('outFileNameInput').value.trim();
+            if(!name) name = "MOVINS_RESULT.edi";
+            if(!name.toLowerCase().endsWith(".edi")) name += ".edi";
+            
+            let a = document.createElement('a');
+            a.href = url; a.download = name;
+            document.body.appendChild(a); a.click(); document.body.removeChild(a);
+        }
+    </script>
+</body>
+</html>
