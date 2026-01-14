@@ -3,7 +3,7 @@
 <head>
     <meta charset="utf-8"/>
     <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
-    <title>NPCT1 PLANNING - MOVINS CONVERTER - V.2.9</title>
+    <title>NPCT1 PLANNING - MOVINS CONVERTER - V.2.11</title>
     <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com?plugins=forms,typography"></script>
     <!-- Fonts & Icons -->
@@ -69,7 +69,7 @@
                 </div>
                 <div>
                     <h1 class="text-lg font-bold bg-clip-text text-transparent bg-gradient-to-r from-slate-900 to-slate-600 dark:from-white dark:to-slate-400">
-                        NPCT1 PLANNING - MOVINS CONVERTER & BAPLIE EDITOR
+                        NPCT1 PLANNING - MOVINS CONVERTER & BAPLIE EDITOR V.2
                     </h1>
                     <p class="text-xs text-slate-500 dark:text-slate-400 font-medium">Skuy Gasskeuun</p>
                 </div>
@@ -156,7 +156,7 @@
                     </button>
                     <button id="btnTabEditor" onclick="switchTab('editor')" class="tab-inactive py-4 px-6 inline-flex items-center gap-2 text-sm transition-all focus:outline-none rounded-t-lg">
                         <span class="material-icons-round text-lg">edit_note</span>
-                        Baplie Editor (All Data)
+                        Baplie Editor (Import)
                     </button>
                 </nav>
             </div>
@@ -186,7 +186,6 @@
                         </h3>
                     </div>
                     <div class="overflow-x-auto">
-                        <!-- Added table-fixed and percentage widths -->
                         <table class="w-full text-left border-collapse table-fixed">
                             <thead>
                                 <tr class="bg-slate-50 dark:bg-slate-700/50 border-b border-slate-200 dark:border-slate-700 text-xs uppercase tracking-wider text-slate-500 dark:text-slate-400">
@@ -210,7 +209,6 @@
                         </h3>
                     </div>
                     <div class="overflow-x-auto">
-                        <!-- Added table-fixed and percentage widths -->
                         <table class="w-full text-left border-collapse table-fixed">
                             <thead>
                                 <tr class="bg-slate-50 dark:bg-slate-700/50 border-b border-slate-200 dark:border-slate-700 text-xs uppercase tracking-wider text-slate-500 dark:text-slate-400">
@@ -251,7 +249,6 @@
                         </h3>
                     </div>
                     <div class="overflow-x-auto">
-                        <!-- Added table-fixed and percentage widths -->
                         <table class="w-full text-left border-collapse table-fixed">
                             <thead>
                                 <tr class="bg-slate-50 dark:bg-slate-700/50 border-b border-slate-200 dark:border-slate-700 text-xs uppercase tracking-wider text-slate-500 dark:text-slate-400">
@@ -275,7 +272,6 @@
                         </h3>
                     </div>
                     <div class="overflow-x-auto">
-                        <!-- Added table-fixed and percentage widths -->
                         <table class="w-full text-left border-collapse table-fixed">
                             <thead>
                                 <tr class="bg-slate-50 dark:bg-slate-700/50 border-b border-slate-200 dark:border-slate-700 text-xs uppercase tracking-wider text-slate-500 dark:text-slate-400">
@@ -373,7 +369,7 @@
             }
         }
 
-        // --- CORE LOGIC V2.8 ---
+        // --- CORE LOGIC V2.11 ---
         let globalData = [];
         let headerLines = [];
         let footerLines = [];
@@ -453,6 +449,15 @@
                     if(line.startsWith("LOC+147")) slot = line.split("+")[1].split(":")[0].trim();
                     if(line.startsWith("LOC+11")) pod = line.split("+")[2];
                     if(line.startsWith("LOC+12")) pod = line.split("+")[2]; 
+                    
+                    // NEW: Prioritize LOC+83 (Place of Delivery) if present
+                    if(line.startsWith("LOC+83")) {
+                        let parts = line.split("+");
+                        if(parts.length > 2 && parts[2].trim() !== "") {
+                            pod = parts[2];
+                        }
+                    }
+
                     if(line.startsWith("EQD+CN")) {
                         let parts = line.split("+");
                         if(parts.length > 3) type = parts[3].split(":")[0]; 
@@ -461,6 +466,7 @@
                 });
 
                 let isLoad = full.includes("LOC+9+IDJKT") || full.includes("LOC+6+IDJKT") || full.includes("LOC+9+IDCRP");
+                // Expanded logic to detect Import based on new pod extraction
                 let isDischarge = pod.includes("IDJKT") || pod.includes("XXDKT") || pod.includes("IDDKT") || pod.includes("IDCRP");
 
                 if(isLoad) stats.load++;
@@ -582,7 +588,9 @@
                 d.raw.forEach(orig => {
                     let s = orig;
                     let parts = s.split("+");
-                    if(s.startsWith("LOC+11") || s.startsWith("LOC+12")) {
+                    
+                    // UPDATE: Also checking LOC+83 now
+                    if(s.startsWith("LOC+11") || s.startsWith("LOC+12") || s.startsWith("LOC+83")) {
                         if(parts.length > 2) { parts[2] = d.pod; s = parts.join("+"); }
                     }
                     if(s.startsWith("EQD+CN")) {
@@ -619,6 +627,8 @@
 
                     if(s.startsWith("LOC+11") || s.startsWith("LOC+12")) { s = `LOC+11+${d.pod}`; }
                     if(s.startsWith("LOC+9") || s.startsWith("LOC+6")) { s = `LOC+9+IDJKT`; }
+                    if(s.startsWith("LOC+83")) { s = `LOC+83+${d.pod}`; } // Also update LOC+83 in MOVINS
+                    
                     if(s.startsWith("EQD+CN")) { 
                         if(parts.length > 3) parts[3] = d.type; 
                         if(parts.length > 2) parts[2] = ""; 
