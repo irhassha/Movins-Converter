@@ -5,27 +5,28 @@
 <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
 <title>NPCT1 PLANNING - BAPLIE Editor</title>
 <script src="https://cdn.tailwindcss.com?plugins=forms,typography"></script>
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet"/>
 <link href="https://fonts.googleapis.com/icon?family=Material+Icons+Round" rel="stylesheet"/>
 <script>
     tailwind.config = {
         darkMode: "class",
         theme: {
             extend: {
-                colors: {
-                    primary: "#3b82f6", // Vibrant Blue
-                    "background-light": "#f8fafc",
-                    "background-dark": "#0f172a",
-                    "surface-light": "rgba(255, 255, 255, 0.7)",
-                    "surface-dark": "rgba(15, 23, 42, 0.7)",
+                    colors: {
+                        primary: "#3b82f6", // Vibrant Blue
+                        "background-light": "#f8fafc",
+                        "background-dark": "#0f172a",
+                        "surface-light": "rgba(255, 255, 255, 0.7)",
+                        "surface-dark": "rgba(15, 23, 42, 0.7)",
+                    },
+                    fontFamily: {
+                        // UBAH BAGIAN INI:
+                        sans: ["Plus Jakarta Sans", "sans-serif"],
+                    },
+                    borderRadius: {
+                        DEFAULT: "0.75rem",
+                    },
                 },
-                fontFamily: {
-                    sans: ["Inter", "sans-serif"],
-                },
-                borderRadius: {
-                    DEFAULT: "0.75rem",
-                },
-            },
         },
     };
 </script>
@@ -662,4 +663,5 @@
 </script>
 
 </body></html>
+
 
