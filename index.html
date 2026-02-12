@@ -1,12 +1,17 @@
+<!-- ================= BEGIN HTML (index.html) ================= -->
 <!DOCTYPE html>
 <html lang="en">
 <head>
 <meta charset="utf-8"/>
 <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
 <title>NPCT1 PLANNING - BAPLIE Editor</title>
+
+<!-- Tailwind & Fonts -->
 <script src="https://cdn.tailwindcss.com?plugins=forms,typography"></script>
 <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet"/>
 <link href="https://fonts.googleapis.com/icon?family=Material+Icons+Round" rel="stylesheet"/>
+
+<!-- Tailwind Configuration -->
 <script>
     tailwind.config = {
         darkMode: "class",
@@ -20,7 +25,6 @@
                         "surface-dark": "rgba(15, 23, 42, 0.7)",
                     },
                     fontFamily: {
-                        // UBAH BAGIAN INI:
                         sans: ["Plus Jakarta Sans", "sans-serif"],
                     },
                     borderRadius: {
@@ -30,6 +34,8 @@
         },
     };
 </script>
+
+<!-- ================= BEGIN CSS (styles.css) ================= -->
 <style>
     .glass-panel {
         backdrop-filter: blur(12px);
@@ -72,7 +78,24 @@
     }
     .tab-inactive { color: #64748b; border-bottom: 3px solid transparent; }
     .dark .tab-inactive { color: #94a3b8; }
+    
+    /* Custom Scrollbar for Modal */
+    .custom-scrollbar::-webkit-scrollbar {
+        width: 6px;
+    }
+    .custom-scrollbar::-webkit-scrollbar-track {
+        background: transparent;
+    }
+    .custom-scrollbar::-webkit-scrollbar-thumb {
+        background: rgba(148, 163, 184, 0.5);
+        border-radius: 10px;
+    }
+    .dark .custom-scrollbar::-webkit-scrollbar-thumb {
+        background: rgba(71, 85, 105, 0.8);
+    }
 </style>
+<!-- ================= END CSS ================= -->
+
 </head>
 <body class="font-sans antialiased text-slate-800 dark:text-slate-100 bg-background-light dark:bg-background-dark min-h-screen flex flex-col transition-colors duration-300">
     
@@ -139,9 +162,6 @@
                         </div>
                         <input id="fileInput" accept=".edi,.txt" class="absolute inset-0 w-full h-full opacity-0 cursor-pointer" type="file"/>
                     </div>
-                    
-                    <!-- Recently Processed Removed -->
-
                 </div>
             </div>
 
@@ -170,7 +190,7 @@
                             <span class="material-icons-round text-2xl">grid_view</span>
                         </div>
                         <div class="z-10">
-                            <p class="text-xs text-slate-500 dark:text-slate-400 uppercase tracking-wide font-bold">Total Container</p>
+                            <p class="text-xs text-slate-500 dark:text-slate-400 uppercase tracking-wide font-bold">Total Containers</p>
                             <h3 id="cntTotal" class="text-3xl font-extrabold text-slate-800 dark:text-white">0</h3>
                         </div>
                     </div>
@@ -217,7 +237,7 @@
 
                     <!-- CONTENT: MOVINS -->
                     <div id="tabMovinsContent" class="p-6 space-y-8">
-                        <!-- Table POD -->
+                        <!-- Table POD (MOVINS) -->
                         <div class="bg-white/40 dark:bg-slate-800/40 rounded-xl overflow-hidden border border-white/20 dark:border-slate-700/30">
                             <div class="p-4 bg-slate-50/50 dark:bg-slate-800/80 border-b border-slate-200/50 dark:border-slate-700">
                                 <h3 class="font-bold text-slate-800 dark:text-white flex items-center gap-2">
@@ -229,9 +249,9 @@
                                     <thead class="bg-slate-50/30 dark:bg-slate-700/30 text-xs uppercase text-slate-500 dark:text-slate-400">
                                         <tr>
                                             <th class="px-6 py-3 font-semibold text-center">Destination (POD)</th>
-                                            <th class="px-6 py-3 font-semibold text-center">Count</th>
-                                            <th class="px-6 py-3 font-semibold text-center">Change To</th>
-                                            <th class="px-6 py-3 font-semibold text-center">Action</th>
+                                            <th class="px-6 py-3 font-semibold text-center w-24">Count</th>
+                                            <th class="px-6 py-3 font-semibold text-center w-48">Change To</th>
+                                            <th class="px-6 py-3 font-semibold text-center w-32">Action</th>
                                         </tr>
                                     </thead>
                                     <tbody id="tblMovinsPodBody" class="divide-y divide-slate-100 dark:divide-slate-700 text-sm"></tbody>
@@ -251,9 +271,9 @@
                                     <thead class="bg-slate-50/30 dark:bg-slate-700/30 text-xs uppercase text-slate-500 dark:text-slate-400">
                                         <tr>
                                             <th class="px-14 py-3 font-semibold text-center">ISO Code</th>
-                                            <th class="px-6 py-3 font-semibold text-center">Count</th>
-                                            <th class="px-6 py-3 font-semibold text-center">Change To</th>
-                                            <th class="px-6 py-3 font-semibold text-center">Action</th>
+                                            <th class="px-6 py-3 font-semibold text-center w-24">Count</th>
+                                            <th class="px-6 py-3 font-semibold text-center w-48">Change To</th>
+                                            <th class="px-6 py-3 font-semibold text-center w-32">Action</th>
                                         </tr>
                                     </thead>
                                     <tbody id="tblMovinsIsoBody" class="divide-y divide-slate-100 dark:divide-slate-700 text-sm"></tbody>
@@ -264,24 +284,30 @@
 
                     <!-- CONTENT: EDITOR -->
                     <div id="tabEditorContent" class="hidden p-6 space-y-8">
-                        <!-- Table POD -->
+                        <!-- Table LOC (BAPLIE EDITOR) -->
                         <div class="bg-white/40 dark:bg-slate-800/40 rounded-xl overflow-hidden border border-white/20 dark:border-slate-700/30">
-                            <div class="p-4 bg-slate-50/50 dark:bg-slate-800/80 border-b border-slate-200/50 dark:border-slate-700">
+                            <div class="p-4 bg-slate-50/50 dark:bg-slate-800/80 border-b border-slate-200/50 dark:border-slate-700 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
                                 <h3 class="font-bold text-slate-800 dark:text-white flex items-center gap-2">
-                                    <span class="material-icons-round text-blue-500">edit_location_alt</span> Global POD Editor
+                                    <span class="material-icons-round text-blue-500">edit_location_alt</span> Global LOC Editor
                                 </h3>
+                                <div class="flex items-center gap-3 w-full sm:w-auto bg-white/50 dark:bg-slate-900/50 p-2 rounded-lg border border-slate-200 dark:border-slate-700">
+                                    <label for="locSelector" class="text-sm font-semibold text-slate-600 dark:text-slate-300 whitespace-nowrap pl-1">Segment:</label>
+                                    <select id="locSelector" onchange="renderEditorLocTable()" class="w-full sm:w-auto bg-white dark:bg-slate-800 border-none rounded-md px-3 py-1.5 text-sm font-bold text-blue-600 dark:text-blue-400 focus:outline-none focus:ring-2 focus:ring-blue-500 cursor-pointer shadow-sm">
+                                        <option value="">Loading...</option>
+                                    </select>
+                                </div>
                             </div>
                             <div class="overflow-x-auto">
                                 <table class="w-full text-left border-collapse">
                                     <thead class="bg-slate-50/30 dark:bg-slate-700/30 text-xs uppercase text-slate-500 dark:text-slate-400">
                                         <tr>
-                                            <th class="px-6 py-3 font-semibold text-center">Destination (POD)</th>
-                                            <th class="px-6 py-3 font-semibold text-center">Count</th>
-                                            <th class="px-6 py-3 font-semibold text-center">Change To</th>
-                                            <th class="px-6 py-3 font-semibold text-center">Action</th>
+                                            <th class="px-6 py-3 font-semibold text-center" id="locTableHeader">Value LOC+83</th>
+                                            <th class="px-6 py-3 font-semibold text-center w-24">Count</th>
+                                            <th class="px-6 py-3 font-semibold text-center w-48">Change To</th>
+                                            <th class="px-6 py-3 font-semibold text-center w-32">Action</th>
                                         </tr>
                                     </thead>
-                                    <tbody id="tblEditorPodBody" class="divide-y divide-slate-100 dark:divide-slate-700 text-sm"></tbody>
+                                    <tbody id="tblEditorLocBody" class="divide-y divide-slate-100 dark:divide-slate-700 text-sm"></tbody>
                                 </table>
                             </div>
                         </div>
@@ -298,9 +324,9 @@
                                     <thead class="bg-slate-50/30 dark:bg-slate-700/30 text-xs uppercase text-slate-500 dark:text-slate-400">
                                         <tr>
                                             <th class="px-14 py-3 font-semibold text-center">ISO Code</th>
-                                            <th class="px-6 py-3 font-semibold text-center">Count</th>
-                                            <th class="px-6 py-3 font-semibold text-center">Change To</th>
-                                            <th class="px-6 py-3 font-semibold text-center">Action</th>
+                                            <th class="px-6 py-3 font-semibold text-center w-24">Count</th>
+                                            <th class="px-6 py-3 font-semibold text-center w-48">Change To</th>
+                                            <th class="px-6 py-3 font-semibold text-center w-32">Action</th>
                                         </tr>
                                     </thead>
                                     <tbody id="tblEditorIsoBody" class="divide-y divide-slate-100 dark:divide-slate-700 text-sm"></tbody>
@@ -337,11 +363,34 @@
 
         <footer class="w-full p-6 text-center z-10 glass-panel border-t border-white/10 dark:border-slate-700/30">
             <p class="text-xs text-slate-500 dark:text-slate-400/60">
-                © 2025 - Interal Use Only - NPCT1 Stowage Planning
+                © 2025 - Internal Use Only - NPCT1 Stowage Planning
             </p>
         </footer>
     </div>
 
+    <!-- Modal List Container -->
+    <div id="containerModal" class="fixed inset-0 z-[100] hidden items-center justify-center bg-black/60 backdrop-blur-sm transition-opacity duration-300">
+        <div id="containerModalContent" class="bg-white dark:bg-slate-800 rounded-2xl shadow-2xl w-full max-w-md overflow-hidden transform transition-transform scale-95 flex flex-col max-h-[85vh] mx-4 border border-slate-200 dark:border-slate-700">
+            <div class="p-4 border-b border-slate-200 dark:border-slate-700 flex justify-between items-center bg-slate-50/80 dark:bg-slate-900/80 backdrop-blur">
+                <h3 id="modalTitle" class="font-bold text-lg text-slate-800 dark:text-white">Container List</h3>
+                <button onclick="closeModal()" class="text-slate-400 hover:text-red-500 hover:bg-red-50 dark:hover:bg-red-900/30 p-1.5 rounded-lg transition-colors">
+                    <span class="material-icons-round">close</span>
+                </button>
+            </div>
+            <div class="p-4 overflow-y-auto flex-1 bg-slate-50 dark:bg-slate-800 custom-scrollbar" id="modalListContainer">
+                <!-- List goes here -->
+            </div>
+            <div class="p-4 border-t border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900/50 flex justify-end gap-3 backdrop-blur">
+                <button onclick="closeModal()" class="text-sm font-bold text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-700 px-4 py-2.5 rounded-xl transition-colors">Close</button>
+                <button onclick="copyContainerList()" class="flex items-center gap-2 text-sm font-bold text-white bg-blue-500 px-5 py-2.5 rounded-xl shadow-md shadow-blue-500/30 hover:bg-blue-600 hover:-translate-y-0.5 transition-all">
+                    <span class="material-icons-round text-sm">content_copy</span> Copy List
+                </button>
+            </div>
+        </div>
+    </div>
+<!-- ================= END HTML ================= -->
+
+<!-- ================= BEGIN JS (script.js) ================= -->
 <script>
     // --- THEME LOGIC (From Template) ---
     const themeToggle = document.getElementById('theme-toggle');
@@ -468,18 +517,30 @@
 
         function parseSlot(segs) {
             let full = segs.join("'");
-            let slot="", pod="", type="UNK", w=0;
+            let slot="", pod="", type="UNK", w=0, containerNo="";
+            let locs = { loc6: "", loc9: "", loc11: "", loc12: "", loc83: "" };
             
             segs.forEach(line => {
                 if(line.startsWith("LOC+147")) slot = line.split("+")[1].split(":")[0].trim();
+                
+                // Original pod capture for Movins Converter
                 if(line.startsWith("LOC+11")) pod = line.split("+")[2];
                 if(line.startsWith("LOC+12")) pod = line.split("+")[2]; 
                 if(line.startsWith("LOC+83")) { 
                     let parts = line.split("+");
                     if(parts.length > 2 && parts[2].trim() !== "") pod = parts[2];
                 }
+
+                // Specific LOC capture for BAPLIE Editor
+                if(line.startsWith("LOC+6+")) { let p = line.split("+"); if(p.length>2) locs.loc6 = p[2].trim(); }
+                if(line.startsWith("LOC+9+")) { let p = line.split("+"); if(p.length>2) locs.loc9 = p[2].trim(); }
+                if(line.startsWith("LOC+11+")) { let p = line.split("+"); if(p.length>2) locs.loc11 = p[2].trim(); }
+                if(line.startsWith("LOC+12+")) { let p = line.split("+"); if(p.length>2) locs.loc12 = p[2].trim(); }
+                if(line.startsWith("LOC+83+")) { let p = line.split("+"); if(p.length>2) locs.loc83 = p[2].trim(); }
+
                 if(line.startsWith("EQD+CN")) {
                     let parts = line.split("+");
+                    if(parts.length > 2) containerNo = parts[2].trim(); 
                     if(parts.length > 3) type = parts[3].split(":")[0]; 
                 }
                 if(line.startsWith("MEA+WT")) w = parseInt(line.split(":")[1]) || 0;
@@ -492,7 +553,7 @@
             else if(isDischarge) stats.discharge++;
             else stats.rob++;
 
-            globalData.push({ raw: segs, slot, pod, type, weight: w, isLoad: isLoad });
+            globalData.push({ raw: segs, slot, pod, locs, type, containerNo: containerNo, weight: w, isLoad: isLoad });
         }
 
         document.getElementById('cntTotal').innerText = globalData.length;
@@ -506,87 +567,329 @@
         dashboardView.classList.remove('hidden');
         stickyFooter.classList.remove('hidden');
         
+        updateLocSelector();
         renderAllTables();
     }
 
     function renderAllTables() {
+        // MOVINS POD & ISO Tab
         renderGenericTable(globalData.filter(d => d.isLoad), 'tblMovinsPodBody', 'tblMovinsIsoBody', 'mov');
-        renderGenericTable(globalData, 'tblEditorPodBody', 'tblEditorIsoBody', 'edt');
+        
+        // BAPLIE EDITOR ISO Tab
+        renderGenericTable(globalData, null, 'tblEditorIsoBody', 'edt');
+        
+        // BAPLIE EDITOR LOC Tab (Dinamis)
+        renderEditorLocTable();
     }
 
+    // Fungsi helper untuk tabel standar
     function renderGenericTable(dataSource, podTbodyId, isoTbodyId, idPrefix) {
-        let grpPod = {};
-        dataSource.forEach(d => grpPod[d.pod] = (grpPod[d.pod]||0)+1);
-        let tbodyPod = document.getElementById(podTbodyId);
-        tbodyPod.innerHTML = "";
-        
-        for(let [p,c] of Object.entries(grpPod)) {
-            let row = `
-            <tr class="border-b border-slate-100 dark:border-slate-700/50 hover:bg-white/30 dark:hover:bg-slate-700/30 transition-colors">
-                <td class="px-6 py-3 font-medium text-slate-900 dark:text-slate-100 font-mono text-center">${p}</td>
-                <td class="px-6 py-3 text-center"><span class="bg-blue-100 dark:bg-blue-900/30 text-blue-800 dark:text-blue-300 text-xs px-2 py-1 rounded-full font-bold">${c}</span></td>
-                <td class="px-6 py-3 text-center">
-                    <input id="in-pod-${idPrefix}-${p}" type="text" value="${p}" class="w-full bg-white/50 dark:bg-slate-900/50 border border-slate-300 dark:border-slate-600 rounded px-2 py-1 text-sm font-mono uppercase focus:ring-2 focus:ring-blue-500 text-center">
-                </td>
-                <td class="px-6 py-3 text-center">
-                    <button onclick="updPod('${p}', 'in-pod-${idPrefix}-${p}')" class="text-white bg-blue-500 hover:bg-blue-600 rounded px-3 py-1 text-xs font-bold transition-colors shadow-sm">Update</button>
-                </td>
-            </tr>`;
-            tbodyPod.innerHTML += row;
+        if(podTbodyId) {
+            let grpPod = {};
+            dataSource.forEach(d => grpPod[d.pod] = (grpPod[d.pod]||0)+1);
+            let tbodyPod = document.getElementById(podTbodyId);
+            tbodyPod.innerHTML = "";
+            
+            for(let [p,c] of Object.entries(grpPod)) {
+                let row = `
+                <tr class="border-b border-slate-100 dark:border-slate-700/50 hover:bg-white/30 dark:hover:bg-slate-700/30 transition-colors">
+                    <td class="px-6 py-3 font-medium text-slate-900 dark:text-slate-100 font-mono text-center">${p}</td>
+                    <td class="px-6 py-3 text-center">
+                        <span onclick="showContainerList('movins_pod', '${p}')" title="Click to view Containers" class="cursor-pointer bg-blue-100 dark:bg-blue-900/40 text-blue-800 dark:text-blue-300 text-xs px-3 py-1.5 rounded-full font-bold hover:ring-2 hover:ring-blue-400 dark:hover:ring-blue-500 transition-all">${c}</span>
+                    </td>
+                    <td class="px-6 py-3 text-center">
+                        <input id="in-pod-${idPrefix}-${p}" type="text" value="${p}" class="w-full bg-white/50 dark:bg-slate-900/50 border border-slate-300 dark:border-slate-600 rounded px-2 py-1 text-sm font-mono uppercase focus:ring-2 focus:ring-blue-500 text-center">
+                    </td>
+                    <td class="px-6 py-3 text-center">
+                        <button onclick="updPod('${p}', 'in-pod-${idPrefix}-${p}')" class="text-white bg-blue-500 hover:bg-blue-600 rounded px-3 py-1 text-xs font-bold transition-colors shadow-sm w-full">Update</button>
+                    </td>
+                </tr>`;
+                tbodyPod.innerHTML += row;
+            }
         }
 
-        let grpIso = {};
-        dataSource.forEach(d => grpIso[d.type] = (grpIso[d.type]||0)+1);
-        let tbodyIso = document.getElementById(isoTbodyId);
-        tbodyIso.innerHTML = "";
-        
-        for(let [t,c] of Object.entries(grpIso)) {
-            let safeT = t.replace(/[^a-zA-Z0-9]/g, "");
-            let row = `
-            <tr class="border-b border-slate-100 dark:border-slate-700/50 hover:bg-white/30 dark:hover:bg-slate-700/30 transition-colors">
-                <td class="px-6 py-3 font-medium text-slate-900 dark:text-slate-100 font-mono text-center">${t}</td>
-                <td class="px-6 py-3 text-center"><span class="bg-indigo-100 dark:bg-indigo-900/30 text-indigo-800 dark:text-indigo-300 text-xs px-2 py-1 rounded-full font-bold">${c}</span></td>
-                <td class="px-6 py-3 text-center">
-                    <input id="in-iso-${idPrefix}-${safeT}" type="text" value="${t}" class="w-full bg-white/50 dark:bg-slate-900/50 border border-slate-300 dark:border-slate-600 rounded px-2 py-1 text-sm font-mono uppercase focus:ring-2 focus:ring-indigo-500 text-center">
-                </td>
-                <td class="px-6 py-3 text-center">
-                    <button onclick="updIso('${t}', 'in-iso-${idPrefix}-${safeT}')" class="text-white bg-indigo-500 hover:bg-indigo-600 rounded px-3 py-1 text-xs font-bold transition-colors shadow-sm">Update</button>
-                </td>
-            </tr>`;
-            tbodyIso.innerHTML += row;
+        if(isoTbodyId) {
+            let grpIso = {};
+            dataSource.forEach(d => grpIso[d.type] = (grpIso[d.type]||0)+1);
+            let tbodyIso = document.getElementById(isoTbodyId);
+            tbodyIso.innerHTML = "";
+            
+            for(let [t,c] of Object.entries(grpIso)) {
+                let safeT = t.replace(/[^a-zA-Z0-9]/g, "");
+                // Tentukan konteks untuk filter klik kontainer (Movins Load atau Global Editor)
+                let filterType = (idPrefix === 'mov') ? 'movins_iso' : 'editor_iso';
+                let row = `
+                <tr class="border-b border-slate-100 dark:border-slate-700/50 hover:bg-white/30 dark:hover:bg-slate-700/30 transition-colors">
+                    <td class="px-6 py-3 font-medium text-slate-900 dark:text-slate-100 font-mono text-center">${t}</td>
+                    <td class="px-6 py-3 text-center">
+                        <span onclick="showContainerList('${filterType}', '${t}')" title="Click to view Containers" class="cursor-pointer bg-indigo-100 dark:bg-indigo-900/40 text-indigo-800 dark:text-indigo-300 text-xs px-3 py-1.5 rounded-full font-bold hover:ring-2 hover:ring-indigo-400 dark:hover:ring-indigo-500 transition-all">${c}</span>
+                    </td>
+                    <td class="px-6 py-3 text-center">
+                        <input id="in-iso-${idPrefix}-${safeT}" type="text" value="${t}" class="w-full bg-white/50 dark:bg-slate-900/50 border border-slate-300 dark:border-slate-600 rounded px-2 py-1 text-sm font-mono uppercase focus:ring-2 focus:ring-indigo-500 text-center">
+                    </td>
+                    <td class="px-6 py-3 text-center">
+                        <button onclick="updIso('${t}', 'in-iso-${idPrefix}-${safeT}')" class="text-white bg-indigo-500 hover:bg-indigo-600 rounded px-3 py-1 text-xs font-bold transition-colors shadow-sm w-full">Update</button>
+                    </td>
+                </tr>`;
+                tbodyIso.innerHTML += row;
+            }
         }
     }
 
+    // Update Dropdown Segmen berdasarkan LOC yang ada di file
+    window.updateLocSelector = function() {
+        let availableLocs = { loc83: false, loc11: false, loc12: false, loc9: false, loc6: false };
+        globalData.forEach(d => {
+            if (d.locs.loc83) availableLocs.loc83 = true;
+            if (d.locs.loc11) availableLocs.loc11 = true;
+            if (d.locs.loc12) availableLocs.loc12 = true;
+            if (d.locs.loc9) availableLocs.loc9 = true;
+            if (d.locs.loc6) availableLocs.loc6 = true;
+        });
+
+        const selector = document.getElementById('locSelector');
+        selector.innerHTML = ""; // Bersihkan opsi sebelumnya
+
+        const labels = {
+            'loc83': 'LOC+83 (Routing)',
+            'loc11': 'LOC+11 (Discharge POD)',
+            'loc12': 'LOC+12 (Transhipment POD)',
+            'loc9': 'LOC+9 (Loading POL)',
+            'loc6': 'LOC+6 (Origin POL)'
+        };
+
+        let addedCount = 0;
+        for (let key in availableLocs) {
+            if (availableLocs[key]) {
+                let opt = document.createElement('option');
+                opt.value = key;
+                opt.text = labels[key];
+                selector.appendChild(opt);
+                addedCount++;
+            }
+        }
+
+        if (addedCount === 0) {
+             let opt = document.createElement('option');
+             opt.value = "";
+             opt.text = "No LOC segments";
+             selector.appendChild(opt);
+        }
+    };
+
+    // Render Tabel Dinamis untuk BAPLIE Editor berdasarkan LOC yang dipilih
+    window.renderEditorLocTable = function() {
+        let currentLocField = document.getElementById('locSelector').value;
+        if (!currentLocField) {
+            document.getElementById('locTableHeader').innerText = "Value";
+            document.getElementById('tblEditorLocBody').innerHTML = `<tr><td colspan="4" class="px-6 py-6 text-center text-slate-500 dark:text-slate-400 italic">No LOC segment data found in this file.</td></tr>`;
+            return;
+        }
+
+        let locPrefixMap = {
+            'loc6': 'LOC+6 (Origin POL)',
+            'loc9': 'LOC+9 (Loading POL)',
+            'loc11': 'LOC+11 (Discharge POD)',
+            'loc12': 'LOC+12 (Transhipment POD)',
+            'loc83': 'LOC+83 (Routing)'
+        };
+        document.getElementById('locTableHeader').innerText = "Value " + locPrefixMap[currentLocField];
+
+        let grpLoc = {};
+        globalData.forEach(d => {
+            let val = d.locs[currentLocField];
+            if (val) {
+                grpLoc[val] = (grpLoc[val] || 0) + 1;
+            }
+        });
+
+        let tbodyLoc = document.getElementById('tblEditorLocBody');
+        tbodyLoc.innerHTML = "";
+        
+        for(let [val, c] of Object.entries(grpLoc)) {
+            let safeVal = val.replace(/[^a-zA-Z0-9]/g, "_");
+            let inputId = `in-loc-edt-${safeVal}`;
+            let row = `
+            <tr class="border-b border-slate-100 dark:border-slate-700/50 hover:bg-white/30 dark:hover:bg-slate-700/30 transition-colors">
+                <td class="px-6 py-3 font-medium text-slate-900 dark:text-slate-100 font-mono text-center">${val}</td>
+                <td class="px-6 py-3 text-center">
+                    <span onclick="showContainerList('editor_loc', '${val}', '${currentLocField}')" title="Click to view Containers" class="cursor-pointer bg-blue-100 dark:bg-blue-900/40 text-blue-800 dark:text-blue-300 text-xs px-3 py-1.5 rounded-full font-bold hover:ring-2 hover:ring-blue-400 dark:hover:ring-blue-500 transition-all">${c}</span>
+                </td>
+                <td class="px-6 py-3 text-center">
+                    <input id="${inputId}" type="text" value="${val}" class="w-full bg-white/50 dark:bg-slate-900/50 border border-slate-300 dark:border-slate-600 rounded px-2 py-1 text-sm font-mono uppercase focus:ring-2 focus:ring-blue-500 text-center">
+                </td>
+                <td class="px-6 py-3 text-center">
+                    <button onclick="updEditorLoc('${currentLocField}', '${val}', '${inputId}')" class="text-white bg-blue-500 hover:bg-blue-600 rounded px-3 py-1 text-xs font-bold transition-colors shadow-sm w-full">Update</button>
+                </td>
+            </tr>`;
+            tbodyLoc.innerHTML += row;
+        }
+
+        if (Object.keys(grpLoc).length === 0) {
+            tbodyLoc.innerHTML = `<tr><td colspan="4" class="px-6 py-6 text-center text-slate-500 dark:text-slate-400 italic">Data for this segment was not found in the file.</td></tr>`;
+        }
+    };
+
+    // --- FITUR MODAL CONTAINER LIST ---
+    window.currentContainerList = [];
+
+    window.showContainerList = function(filterType, value, extraParam) {
+        let list = [];
+        let title = "";
+
+        if(filterType === 'movins_pod') {
+            list = globalData.filter(d => d.isLoad && d.pod === value).map(d => d.containerNo);
+            title = `Containers (Load) - POD: ${value}`;
+        } else if(filterType === 'movins_iso') {
+            list = globalData.filter(d => d.isLoad && d.type === value).map(d => d.containerNo);
+            title = `Containers (Load) - ISO: ${value}`;
+        } else if(filterType === 'editor_iso') {
+            list = globalData.filter(d => d.type === value).map(d => d.containerNo);
+            title = `All Containers - ISO: ${value}`;
+        } else if(filterType === 'editor_loc') {
+            list = globalData.filter(d => d.locs[extraParam] === value).map(d => d.containerNo);
+            let locName = extraParam.toUpperCase(); 
+            title = `Containers - ${locName}: ${value}`;
+        }
+
+        // Hapus array kosong jika ada kontainer tanpa id EQD
+        list = list.filter(cn => cn !== "");
+        window.currentContainerList = list;
+
+        let html = `<div class="grid grid-cols-1 sm:grid-cols-2 gap-2">`;
+        list.forEach((cn, i) => {
+            html += `
+            <div class="flex items-center gap-3 px-3 py-2 bg-white dark:bg-slate-700/50 rounded-lg border border-slate-200 dark:border-slate-600 shadow-sm">
+                <span class="text-[10px] font-bold text-slate-400 dark:text-slate-500 w-5 text-right">${i+1}.</span>
+                <span class="font-mono text-sm text-slate-800 dark:text-slate-100 font-bold tracking-wider">${cn}</span>
+            </div>`;
+        });
+        html += `</div>`;
+
+        if(list.length === 0) {
+            html = `<p class="text-center text-slate-500 text-sm py-4 italic">Container numbers not detected (EQD+CN missing).</p>`;
+        }
+
+        document.getElementById('modalTitle').innerText = title;
+        document.getElementById('modalListContainer').innerHTML = html;
+
+        const modal = document.getElementById('containerModal');
+        const modalContent = document.getElementById('containerModalContent');
+        modal.classList.remove('hidden');
+        modal.classList.add('flex');
+        
+        // Animasi pop-up
+        setTimeout(() => {
+            modalContent.classList.remove('scale-95');
+            modalContent.classList.add('scale-100');
+        }, 10);
+    };
+
+    window.closeModal = function() {
+        const modal = document.getElementById('containerModal');
+        const modalContent = document.getElementById('containerModalContent');
+        modalContent.classList.remove('scale-100');
+        modalContent.classList.add('scale-95');
+        
+        setTimeout(() => {
+            modal.classList.add('hidden');
+            modal.classList.remove('flex');
+        }, 200);
+    };
+
+    window.copyContainerList = function() {
+        if(window.currentContainerList && window.currentContainerList.length > 0) {
+            let text = window.currentContainerList.join('\n');
+            let tempInput = document.createElement("textarea");
+            tempInput.value = text;
+            document.body.appendChild(tempInput);
+            tempInput.select();
+            document.execCommand("copy");
+            document.body.removeChild(tempInput);
+            
+            // Temporary feedback on button
+            let btn = event.currentTarget;
+            let originalHtml = btn.innerHTML;
+            btn.innerHTML = `<span class="material-icons-round text-sm">check</span> Copied!`;
+            btn.classList.replace('bg-blue-500', 'bg-green-500');
+            btn.classList.replace('hover:bg-blue-600', 'hover:bg-green-600');
+            btn.classList.replace('shadow-blue-500/30', 'shadow-green-500/30');
+            
+            setTimeout(() => {
+                btn.innerHTML = originalHtml;
+                btn.classList.replace('bg-green-500', 'bg-blue-500');
+                btn.classList.replace('hover:bg-green-600', 'hover:bg-blue-600');
+                btn.classList.replace('shadow-green-500/30', 'shadow-blue-500/30');
+            }, 2000);
+        }
+    };
+
+    // --- FUNGSI UPDATE ---
+    window.updEditorLoc = function(locKey, oldVal, inputId) {
+        let newVal = document.getElementById(inputId).value.toUpperCase().trim();
+        if(!newVal || newVal === oldVal) return;
+        let count = 0;
+        let prefixMap = {
+            'loc6': 'LOC+6',
+            'loc9': 'LOC+9',
+            'loc11': 'LOC+11',
+            'loc12': 'LOC+12',
+            'loc83': 'LOC+83'
+        };
+        let targetPrefix = prefixMap[locKey];
+
+        globalData.forEach(d => {
+            if(d.locs[locKey] === oldVal) {
+                d.locs[locKey] = newVal;
+                // Langsung perbarui baris di raw array
+                for(let i=0; i<d.raw.length; i++) {
+                    if(d.raw[i].startsWith(targetPrefix + "+")) {
+                        let parts = d.raw[i].split("+");
+                        if(parts.length > 2) {
+                            parts[2] = newVal;
+                            d.raw[i] = parts.join("+");
+                        }
+                    }
+                }
+                count++;
+            }
+        });
+        alert(`Successfully updated ${count} containers (${targetPrefix}: ${oldVal} -> ${newVal})`);
+        renderEditorLocTable();
+    };
+
+    // Fungsi Update untuk MOVINS Converter (Tetap menggunakan d.pod global)
     window.updPod = function(oldP, inputId) {
         let newP = document.getElementById(inputId).value.toUpperCase().trim();
         if(!newP) return;
         let count = 0;
         globalData.forEach(d => { if(d.pod === oldP) { d.pod = newP; count++; } });
-        alert(`Updated ${count} box (${oldP} -> ${newP})`);
+        alert(`Successfully updated ${count} containers (${oldP} -> ${newP})`);
         renderAllTables();
-    }
+    };
 
+    // Fungsi Update ISO Global (Digunakan bersama)
     window.updIso = function(oldIso, inputId) {
         let newIso = document.getElementById(inputId).value.toUpperCase().trim();
         if(!newIso) return;
         let count = 0;
         globalData.forEach(d => { if(d.type === oldIso) { d.type = newIso; count++; } });
-        alert(`Updated ${count} box (${oldIso} -> ${newIso})`);
+        alert(`Successfully updated ${count} containers (${oldIso} -> ${newIso})`);
         renderAllTables();
-    }
+    };
 
+    // --- DOWNLOAD BAPLIE ---
     window.downloadBaplie = function() {
         let lines = [];
         let c = 0;
         headerLines.forEach(l => { lines.push(l); if(!l.startsWith("UNB")) c++; });
+        
         globalData.forEach(d => {
             let blk = [];
             d.raw.forEach(orig => {
                 let s = orig;
                 let parts = s.split("+");
-                if(s.startsWith("LOC+11") || s.startsWith("LOC+12") || s.startsWith("LOC+83")) {
-                    if(parts.length > 2) { parts[2] = d.pod; s = parts.join("+"); }
-                }
+                
                 if(s.startsWith("EQD+CN")) {
                     if(parts.length > 3) { parts[3] = d.type; s = parts.join("+"); }
                 }
@@ -597,6 +900,7 @@
         finishDownload(lines, c, "BAPLIE_DISCHARGE");
     }
 
+    // --- DOWNLOAD MOVINS ---
     window.downloadMovins = function() {
         let lines = [];
         let c = 0;
@@ -661,7 +965,6 @@
         document.body.appendChild(a); a.click(); document.body.removeChild(a);
     }
 </script>
+<!-- ================= END JS ================= -->
 
 </body></html>
-
-
