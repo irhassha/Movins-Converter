@@ -634,7 +634,7 @@
         }
 
         let total = tmpSegmentErrors.length;
-        tmpIssueText.innerText = `Found ${total} invalid TMP (contoh: coma or double dot). Click button to automatically update.`;
+        tmpIssueText.innerText = `Found ${total} invalid TMP (example: coma or double dot). Click "Fix Error" to automatically update.`;
         btnFixTmp.disabled = false;
         btnFixTmp.classList.remove('opacity-60', 'cursor-not-allowed');
         btnFixTmp.innerHTML = `
@@ -1063,6 +1063,7 @@
 <!-- ================= END JS ================= -->
 
 </body></html>
+
 
 
 
