@@ -181,6 +181,24 @@
                     </div>
                 </div>
 
+                <div id="tmpIssuePanel" class="hidden glass-card rounded-xl p-4 border border-amber-300/70 dark:border-amber-500/40 bg-amber-50/70 dark:bg-amber-900/20">
+                    <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
+                        <div>
+                            <p class="text-sm font-bold text-amber-800 dark:text-amber-200 flex items-center gap-2">
+                                <span class="material-icons-round text-base">warning_amber</span>
+                                Error segmen TMP ditemukan
+                            </p>
+                            <p id="tmpIssueText" class="text-xs text-amber-700 dark:text-amber-300 mt-1">
+                                Ada format TMP yang tidak valid.
+                            </p>
+                        </div>
+                        <button id="btnFixTmp" onclick="fixTmpSegmentErrors()" class="inline-flex items-center justify-center gap-2 px-4 py-2 text-xs font-bold text-white bg-amber-500 hover:bg-amber-600 rounded-lg shadow-sm transition-colors">
+                            <span class="material-icons-round text-sm">build_circle</span>
+                            Fix Error TMP
+                        </button>
+                    </div>
+                </div>
+
                 <!-- Stats Cards -->
                 <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
                     <!-- Total -->
@@ -415,6 +433,7 @@
     let footerLines = [];
     let vesselName = "VESSEL";
     let voyageNo = "0000";
+    let tmpSegmentErrors = [];
 
     // --- DOM REFERENCES ---
     const fileInput = document.getElementById('fileInput');
@@ -424,6 +443,9 @@
     const stickyFooter = document.getElementById('stickyFooter');
     const versionIndicator = document.getElementById('versionIndicator');
     const versionText = document.getElementById('versionText');
+    const tmpIssuePanel = document.getElementById('tmpIssuePanel');
+    const tmpIssueText = document.getElementById('tmpIssueText');
+    const btnFixTmp = document.getElementById('btnFixTmp');
 
     // --- TAB SWITCHING LOGIC ---
     function switchTab(tabName) {
@@ -477,6 +499,7 @@
 
     function processFile(txt) {
         globalData = []; headerLines = []; footerLines = [];
+        tmpSegmentErrors = [];
         let stats = { load: 0, discharge: 0, rob: 0 };
         
         let detectedVersion = "BAPLIE 2.x";
@@ -556,6 +579,9 @@
             globalData.push({ raw: segs, slot, pod, locs, type, containerNo: containerNo, weight: w, isLoad: isLoad });
         }
 
+        scanTmpSegmentErrors();
+        updateTmpIssuePanel();
+
         document.getElementById('cntTotal').innerText = globalData.length;
         document.getElementById('cntLoad').innerText = stats.load;
         document.getElementById('cntDischarge').innerText = stats.discharge;
@@ -570,6 +596,75 @@
         updateLocSelector();
         renderAllTables();
     }
+
+    function normalizeTmpSegment(segment) {
+        if(!segment.startsWith("TMP+2+")) return segment;
+
+        let parts = segment.split("+");
+        if(parts.length < 3) return segment;
+
+        let valuePart = parts[2];
+        let splitIndex = valuePart.indexOf(":");
+        let tempValue = splitIndex >= 0 ? valuePart.slice(0, splitIndex) : valuePart;
+        let suffix = splitIndex >= 0 ? valuePart.slice(splitIndex) : "";
+
+        let normalizedValue = tempValue.replace(/,/g, ".").replace(/\.{2,}/g, ".");
+        if(normalizedValue === tempValue) return segment;
+
+        parts[2] = normalizedValue + suffix;
+        return parts.join("+");
+    }
+
+    function scanTmpSegmentErrors() {
+        tmpSegmentErrors = [];
+        globalData.forEach((d, dataIndex) => {
+            d.raw.forEach((line, lineIndex) => {
+                let fixed = normalizeTmpSegment(line);
+                if(fixed !== line) {
+                    tmpSegmentErrors.push({ dataIndex, lineIndex, original: line, fixed });
+                }
+            });
+        });
+    }
+
+    function updateTmpIssuePanel() {
+        if(tmpSegmentErrors.length === 0) {
+            tmpIssuePanel.classList.add('hidden');
+            return;
+        }
+
+        let total = tmpSegmentErrors.length;
+        tmpIssueText.innerText = `Ditemukan ${total} segmen TMP tidak valid (contoh: koma atau titik ganda). Klik tombol untuk perbaiki otomatis.`;
+        btnFixTmp.disabled = false;
+        btnFixTmp.classList.remove('opacity-60', 'cursor-not-allowed');
+        btnFixTmp.innerHTML = `
+            <span class="material-icons-round text-sm">build_circle</span>
+            Fix Error TMP
+        `;
+        tmpIssuePanel.classList.remove('hidden');
+    }
+
+    window.fixTmpSegmentErrors = function() {
+        if(tmpSegmentErrors.length === 0) {
+            alert("Tidak ada error segmen TMP yang perlu diperbaiki.");
+            return;
+        }
+
+        tmpSegmentErrors.forEach(err => {
+            globalData[err.dataIndex].raw[err.lineIndex] = err.fixed;
+        });
+
+        let totalFixed = tmpSegmentErrors.length;
+        tmpSegmentErrors = [];
+        tmpIssueText.innerText = `Berhasil memperbaiki ${totalFixed} segmen TMP.`;
+        btnFixTmp.disabled = true;
+        btnFixTmp.classList.add('opacity-60', 'cursor-not-allowed');
+        btnFixTmp.innerHTML = `
+            <span class="material-icons-round text-sm">check_circle</span>
+            TMP Fixed
+        `;
+        alert(`Berhasil memperbaiki ${totalFixed} segmen TMP error.`);
+    };
 
     function renderAllTables() {
         // MOVINS POD & ISO Tab
