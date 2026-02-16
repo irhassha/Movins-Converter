@@ -186,10 +186,10 @@
                         <div>
                             <p class="text-sm font-bold text-amber-800 dark:text-amber-200 flex items-center gap-2">
                                 <span class="material-icons-round text-base">warning_amber</span>
-                                Error segmen TMP ditemukan
+                                Found error on TMP Segment
                             </p>
                             <p id="tmpIssueText" class="text-xs text-amber-700 dark:text-amber-300 mt-1">
-                                Ada format TMP yang tidak valid.
+                                There is invalid TMP format.
                             </p>
                         </div>
                         <button id="btnFixTmp" onclick="fixTmpSegmentErrors()" class="inline-flex items-center justify-center gap-2 px-4 py-2 text-xs font-bold text-white bg-amber-500 hover:bg-amber-600 rounded-lg shadow-sm transition-colors">
@@ -634,7 +634,7 @@
         }
 
         let total = tmpSegmentErrors.length;
-        tmpIssueText.innerText = `Ditemukan ${total} segmen TMP tidak valid (contoh: koma atau titik ganda). Klik tombol untuk perbaiki otomatis.`;
+        tmpIssueText.innerText = `Found ${total} invalid TMP (contoh: coma or double dot). Click button to automatically update.`;
         btnFixTmp.disabled = false;
         btnFixTmp.classList.remove('opacity-60', 'cursor-not-allowed');
         btnFixTmp.innerHTML = `
@@ -1063,5 +1063,6 @@
 <!-- ================= END JS ================= -->
 
 </body></html>
+
 
 
