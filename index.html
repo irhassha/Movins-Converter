@@ -670,14 +670,14 @@
 
         let totalFixed = tmpSegmentErrors.length;
         tmpSegmentErrors = [];
-        tmpIssueText.innerText = `Berhasil memperbaiki ${totalFixed} segmen TMP.`;
+        tmpIssueText.innerText = `Success fix ${totalFixed} TMP segment.`;
         btnFixTmp.disabled = true;
         btnFixTmp.classList.add('opacity-60', 'cursor-not-allowed');
         btnFixTmp.innerHTML = `
             <span class="material-icons-round text-sm">check_circle</span>
             TMP Fixed
         `;
-        alert(`Berhasil memperbaiki ${totalFixed} segmen TMP error.`);
+        alert(`Success fix ${totalFixed} error TMP segment.`);
     };
 
     function renderAllTables() {
