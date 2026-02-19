@@ -510,6 +510,28 @@
         }
     });
 
+    function fixMalformedTdtSegment(segment) {
+        if(!segment.startsWith("TDT+")) return segment;
+
+        let parts = segment.split("+");
+        if(parts.length < 7) return segment;
+
+        let isMalformed = parts[3] === ""
+            && (parts[4] || "").includes(":")
+            && (parts[6] || "").includes(":");
+
+        if(!isMalformed) return segment;
+
+        let transportStage = (parts[1] || "20").trim() || "20";
+        let voyage = (parts[2] || "").trim();
+        let vessel = (parts[4] || "").trim();
+        let carrier = (parts[6] || "").trim();
+
+        if(!voyage || !vessel || !carrier) return segment;
+
+        return `TDT+${transportStage}+${voyage}+1++${carrier}+++${vessel}`;
+    }
+
     function processFile(txt) {
         globalData = []; headerLines = []; footerLines = [];
         tmpSegmentErrors = [];
@@ -530,6 +552,7 @@
 
             if(s.startsWith("UNH") || s.startsWith("BGM") || s.startsWith("DTM") || s.startsWith("TDT") || s.startsWith("LOC+5") || s.startsWith("UNB")) {
                 if(s.startsWith("TDT")) {
+                    s = fixMalformedTdtSegment(s);
                     let p = s.split("+");
                     if(p.length>2) voyageNo = p[2];
                     if(p.length>8 && p[8].includes(":::")) vesselName = p[8].split(":::")[1];
@@ -648,7 +671,7 @@
         }
 
         let total = tmpSegmentErrors.length;
-        tmpIssueText.innerText = `Found ${total} invalid TMP (example: comma or double dot). Click "Fix Error" to automatically update.`;
+        tmpIssueText.innerText = `Found ${total} invalid TMP (example: coma or double dot). Click "Fix Error" to automatically update.`;
         btnFixTmp.disabled = false;
         btnFixTmp.classList.remove('opacity-60', 'cursor-not-allowed');
         btnFixTmp.innerHTML = `
@@ -670,14 +693,14 @@
 
         let totalFixed = tmpSegmentErrors.length;
         tmpSegmentErrors = [];
-        tmpIssueText.innerText = `Success fix ${totalFixed} TMP segment.`;
+        tmpIssueText.innerText = `Berhasil memperbaiki ${totalFixed} segmen TMP.`;
         btnFixTmp.disabled = true;
         btnFixTmp.classList.add('opacity-60', 'cursor-not-allowed');
         btnFixTmp.innerHTML = `
             <span class="material-icons-round text-sm">check_circle</span>
             TMP Fixed
         `;
-        alert(`Success fix ${totalFixed} error TMP segment.`);
+        alert(`Berhasil memperbaiki ${totalFixed} segmen TMP error.`);
     };
 
     function renderAllTables() {
