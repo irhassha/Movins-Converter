@@ -78,7 +78,7 @@
     }
     .tab-inactive { color: #64748b; border-bottom: 3px solid transparent; }
     .dark .tab-inactive { color: #94a3b8; }
-    
+
     /* Custom Scrollbar for Modal */
     .custom-scrollbar::-webkit-scrollbar {
         width: 6px;
@@ -98,7 +98,7 @@
 
 </head>
 <body class="font-sans antialiased text-slate-800 dark:text-slate-100 bg-background-light dark:bg-background-dark min-h-screen flex flex-col transition-colors duration-300">
-    
+
     <!-- Background Image & Overlay -->
     <div class="fixed inset-0 z-0">
         <img alt="Majestic container vessel at sea with atmospheric lighting" class="w-full h-full object-cover opacity-90 dark:opacity-40" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCNVCY9tGgOU2Qpz8YmjmQyMj9hWTohsEz3lx7-kdONDx1npSJRLVeoSssW5pk5b_z18vafavTanV2Nb8FjgPTvc6fZwYDkefx29p_EhQKf3kdREa5uinfiGKdlDemRqNttvBvatu7oTHpfdfxL2jVC9X9YOcBxxIejuVyTXKnKYpah8g8uaCMBN9RVTjcy1tNL21WaqAYfPL586YUL7oQLLXzySwEN24ftgrdlrOj6ug8hoQB_uiAG-Ct1rP8ir_BDh9-s5QTPHqS7"/>
@@ -107,7 +107,7 @@
 
     <!-- Main Content Wrapper -->
     <div class="relative z-10 flex flex-col h-screen overflow-hidden">
-        
+
         <!-- Header -->
         <header class="w-full px-6 py-4 flex items-center justify-between glass-panel border-b border-white/20 dark:border-slate-700/30 shrink-0">
             <div class="flex items-center gap-4">
@@ -133,7 +133,7 @@
 
         <!-- Main Scrollable Area -->
         <main class="flex-1 overflow-y-auto overflow-x-hidden p-6 sm:p-12" id="mainContainer">
-            
+
             <!-- VIEW 1: LANDING & UPLOAD -->
             <div id="landingView" class="flex flex-col items-center justify-center min-h-[60vh] transition-all duration-500">
                 <div class="w-full max-w-5xl mx-auto text-center mb-8">
@@ -167,7 +167,7 @@
 
             <!-- VIEW 2: DASHBOARD (Hidden Initially) -->
             <div id="dashboardView" class="hidden w-full max-w-6xl mx-auto pb-32 space-y-6">
-                
+
                 <!-- Toolbar -->
                 <div class="flex justify-between items-center glass-card p-4 rounded-xl">
                     <button onclick="location.reload()" class="flex items-center gap-2 text-sm font-medium text-slate-600 dark:text-slate-300 hover:text-red-500 transition-colors">
@@ -258,9 +258,17 @@
                         <!-- Table POD (MOVINS) -->
                         <div class="bg-white/40 dark:bg-slate-800/40 rounded-xl overflow-hidden border border-white/20 dark:border-slate-700/30">
                             <div class="p-4 bg-slate-50/50 dark:bg-slate-800/80 border-b border-slate-200/50 dark:border-slate-700">
-                                <h3 class="font-bold text-slate-800 dark:text-white flex items-center gap-2">
-                                    <span class="material-icons-round text-blue-500">edit_location_alt</span> Export POD Management
-                                </h3>
+                                <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+                                    <h3 class="font-bold text-slate-800 dark:text-white flex items-center gap-2">
+                                        <span class="material-icons-round text-blue-500">edit_location_alt</span> Export POD Management
+                                    </h3>
+                                    <div class="flex items-center gap-3 w-full sm:w-auto bg-white/50 dark:bg-slate-900/50 p-2 rounded-lg border border-slate-200 dark:border-slate-700">
+                                        <label for="movinsPodSelector" class="text-sm font-semibold text-slate-600 dark:text-slate-300 whitespace-nowrap pl-1">Segment:</label>
+                                        <select id="movinsPodSelector" onchange="renderAllTables()" class="w-full sm:w-auto bg-white dark:bg-slate-800 border-none rounded-md px-3 py-1.5 text-sm font-bold text-blue-600 dark:text-blue-400 focus:outline-none focus:ring-2 focus:ring-blue-500 cursor-pointer shadow-sm">
+                                            <option value="loc11">LOC+11 (Discharge POD)</option>
+                                        </select>
+                                    </div>
+                                </div>
                             </div>
                             <div class="overflow-x-auto">
                                 <table class="w-full text-left border-collapse">
@@ -356,13 +364,13 @@
             </div>
 
         </main>
-        
+
         <!-- Sticky Footer (For Download Actions) -->
         <div id="stickyFooter" class="hidden fixed bottom-0 left-0 right-0 glass-panel border-t border-white/20 dark:border-slate-700 z-50 transition-all duration-300">
             <div class="container mx-auto px-6 py-4 max-w-6xl flex flex-col sm:flex-row items-center justify-between gap-4">
                 <div class="flex items-center gap-3 text-sm text-slate-600 dark:text-slate-400 bg-white/50 dark:bg-slate-900/50 px-4 py-3 rounded-xl border border-slate-200 dark:border-slate-600 w-full sm:w-1/3 shadow-inner">
                     <span class="material-icons-round text-lg text-slate-500 flex-shrink-0">save_as</span>
-                    <input type="text" id="outFileNameInput" 
+                    <input type="text" id="outFileNameInput"
                         class="bg-transparent border-none p-0 text-slate-900 dark:text-slate-100 font-mono font-bold text-sm w-full focus:ring-0 focus:outline-none placeholder-slate-400"
                         placeholder="RESULT.edi">
                 </div>
@@ -434,6 +442,11 @@
     let vesselName = "VESSEL";
     let voyageNo = "0000";
     let tmpSegmentErrors = [];
+    const movinsPodSegmentLabels = {
+        loc11: 'LOC+11 (Discharge POD)',
+        loc12: 'LOC+12 (Transhipment POD)',
+        loc83: 'LOC+83 (Routing)'
+    };
 
     // --- DOM REFERENCES ---
     const fileInput = document.getElementById('fileInput');
@@ -453,17 +466,17 @@
         const contentEditor = document.getElementById('tabEditorContent');
         const btnMovins = document.getElementById('btnTabMovins');
         const btnEditor = document.getElementById('btnTabEditor');
-        
+
         const btnFooterMovins = document.getElementById('btnDownloadMovins');
         const btnFooterBaplie = document.getElementById('btnDownloadBaplie');
 
         if(tabName === 'movins') {
             contentMovins.classList.remove('hidden');
             contentEditor.classList.add('hidden');
-            
+
             btnMovins.classList.replace('tab-inactive', 'tab-active');
             btnEditor.classList.replace('tab-active', 'tab-inactive');
-            
+
             btnFooterMovins.classList.remove('hidden');
             btnFooterMovins.classList.add('flex');
             btnFooterBaplie.classList.add('hidden');
@@ -471,10 +484,10 @@
         } else {
             contentMovins.classList.add('hidden');
             contentEditor.classList.remove('hidden');
-            
+
             btnMovins.classList.replace('tab-active', 'tab-inactive');
             btnEditor.classList.replace('tab-inactive', 'tab-active');
-            
+
             btnFooterBaplie.classList.remove('hidden');
             btnFooterBaplie.classList.add('flex');
             btnFooterMovins.classList.add('hidden');
@@ -488,7 +501,7 @@
             let f = this.files[0];
             labelFile.innerText = "Processing: " + f.name;
             labelFile.classList.add("animate-pulse");
-            
+
             let r = new FileReader();
             r.onload = (e) => {
                 setTimeout(() => processFile(e.target.result), 500);
@@ -497,11 +510,33 @@
         }
     });
 
+    function fixMalformedTdtSegment(segment) {
+        if(!segment.startsWith("TDT+")) return segment;
+
+        let parts = segment.split("+");
+        if(parts.length < 7) return segment;
+
+        let isMalformed = parts[3] === ""
+            && (parts[4] || "").includes(":")
+            && (parts[6] || "").includes(":");
+
+        if(!isMalformed) return segment;
+
+        let transportStage = (parts[1] || "20").trim() || "20";
+        let voyage = (parts[2] || "").trim();
+        let vessel = (parts[4] || "").trim();
+        let carrier = (parts[6] || "").trim();
+
+        if(!voyage || !vessel || !carrier) return segment;
+
+        return `TDT+${transportStage}+${voyage}+1++${carrier}+++${vessel}`;
+    }
+
     function processFile(txt) {
         globalData = []; headerLines = []; footerLines = [];
         tmpSegmentErrors = [];
         let stats = { load: 0, discharge: 0, rob: 0 };
-        
+
         let detectedVersion = "BAPLIE 2.x";
         if (txt.includes("SMDG15") || txt.includes("LOC+6+")) {
             detectedVersion = "BAPLIE 1.5";
@@ -517,6 +552,7 @@
 
             if(s.startsWith("UNH") || s.startsWith("BGM") || s.startsWith("DTM") || s.startsWith("TDT") || s.startsWith("LOC+5") || s.startsWith("UNB")) {
                 if(s.startsWith("TDT")) {
+                    s = fixMalformedTdtSegment(s);
                     let p = s.split("+");
                     if(p.length>2) voyageNo = p[2];
                     if(p.length>8 && p[8].includes(":::")) vesselName = p[8].split(":::")[1];
@@ -542,14 +578,14 @@
             let full = segs.join("'");
             let slot="", pod="", type="UNK", w=0, containerNo="";
             let locs = { loc6: "", loc9: "", loc11: "", loc12: "", loc83: "" };
-            
+
             segs.forEach(line => {
                 if(line.startsWith("LOC+147")) slot = line.split("+")[1].split(":")[0].trim();
-                
+
                 // Original pod capture for Movins Converter
                 if(line.startsWith("LOC+11")) pod = line.split("+")[2];
-                if(line.startsWith("LOC+12")) pod = line.split("+")[2]; 
-                if(line.startsWith("LOC+83")) { 
+                if(line.startsWith("LOC+12")) pod = line.split("+")[2];
+                if(line.startsWith("LOC+83")) {
                     let parts = line.split("+");
                     if(parts.length > 2 && parts[2].trim() !== "") pod = parts[2];
                 }
@@ -563,8 +599,8 @@
 
                 if(line.startsWith("EQD+CN")) {
                     let parts = line.split("+");
-                    if(parts.length > 2) containerNo = parts[2].trim(); 
-                    if(parts.length > 3) type = parts[3].split(":")[0]; 
+                    if(parts.length > 2) containerNo = parts[2].trim();
+                    if(parts.length > 3) type = parts[3].split(":")[0];
                 }
                 if(line.startsWith("MEA+WT")) w = parseInt(line.split(":")[1]) || 0;
             });
@@ -585,15 +621,16 @@
         document.getElementById('cntTotal').innerText = globalData.length;
         document.getElementById('cntLoad').innerText = stats.load;
         document.getElementById('cntDischarge').innerText = stats.discharge;
-        
+
         let safeVessel = vesselName ? vesselName.replace(/[^a-zA-Z0-9]/g, "_") : "VESSEL";
         document.getElementById('outFileNameInput').value = `${safeVessel}_${voyageNo}.edi`;
 
         landingView.classList.add('hidden');
         dashboardView.classList.remove('hidden');
         stickyFooter.classList.remove('hidden');
-        
+
         updateLocSelector();
+        updateMovinsPodSelector();
         renderAllTables();
     }
 
@@ -667,39 +704,51 @@
     };
 
     function renderAllTables() {
+        let selectedPodSegment = document.getElementById('movinsPodSelector').value;
+
         // MOVINS POD & ISO Tab
-        renderGenericTable(globalData.filter(d => d.isLoad), 'tblMovinsPodBody', 'tblMovinsIsoBody', 'mov');
-        
+        renderGenericTable(globalData.filter(d => d.isLoad), 'tblMovinsPodBody', 'tblMovinsIsoBody', 'mov', selectedPodSegment);
+
         // BAPLIE EDITOR ISO Tab
         renderGenericTable(globalData, null, 'tblEditorIsoBody', 'edt');
-        
+
         // BAPLIE EDITOR LOC Tab (Dinamis)
         renderEditorLocTable();
     }
 
     // Fungsi helper untuk tabel standar
-    function renderGenericTable(dataSource, podTbodyId, isoTbodyId, idPrefix) {
+    function renderGenericTable(dataSource, podTbodyId, isoTbodyId, idPrefix, podSegmentKey = 'loc11') {
         if(podTbodyId) {
             let grpPod = {};
-            dataSource.forEach(d => grpPod[d.pod] = (grpPod[d.pod]||0)+1);
+            dataSource.forEach(d => {
+                let podValue = (d.locs[podSegmentKey] || d.pod || "").trim();
+                if(!podValue) return;
+                grpPod[podValue] = (grpPod[podValue]||0)+1;
+            });
             let tbodyPod = document.getElementById(podTbodyId);
             tbodyPod.innerHTML = "";
-            
+
             for(let [p,c] of Object.entries(grpPod)) {
+                let safeP = p.replace(/[^a-zA-Z0-9]/g, "_");
                 let row = `
                 <tr class="border-b border-slate-100 dark:border-slate-700/50 hover:bg-white/30 dark:hover:bg-slate-700/30 transition-colors">
                     <td class="px-6 py-3 font-medium text-slate-900 dark:text-slate-100 font-mono text-center">${p}</td>
                     <td class="px-6 py-3 text-center">
-                        <span onclick="showContainerList('movins_pod', '${p}')" title="Click to view Containers" class="cursor-pointer bg-blue-100 dark:bg-blue-900/40 text-blue-800 dark:text-blue-300 text-xs px-3 py-1.5 rounded-full font-bold hover:ring-2 hover:ring-blue-400 dark:hover:ring-blue-500 transition-all">${c}</span>
+                        <span onclick="showContainerList('movins_pod', '${p}', '${podSegmentKey}')" title="Click to view Containers" class="cursor-pointer bg-blue-100 dark:bg-blue-900/40 text-blue-800 dark:text-blue-300 text-xs px-3 py-1.5 rounded-full font-bold hover:ring-2 hover:ring-blue-400 dark:hover:ring-blue-500 transition-all">${c}</span>
                     </td>
                     <td class="px-6 py-3 text-center">
-                        <input id="in-pod-${idPrefix}-${p}" type="text" value="${p}" class="w-full bg-white/50 dark:bg-slate-900/50 border border-slate-300 dark:border-slate-600 rounded px-2 py-1 text-sm font-mono uppercase focus:ring-2 focus:ring-blue-500 text-center">
+                        <input id="in-pod-${idPrefix}-${safeP}" type="text" value="${p}" class="w-full bg-white/50 dark:bg-slate-900/50 border border-slate-300 dark:border-slate-600 rounded px-2 py-1 text-sm font-mono uppercase focus:ring-2 focus:ring-blue-500 text-center">
                     </td>
                     <td class="px-6 py-3 text-center">
-                        <button onclick="updPod('${p}', 'in-pod-${idPrefix}-${p}')" class="text-white bg-blue-500 hover:bg-blue-600 rounded px-3 py-1 text-xs font-bold transition-colors shadow-sm w-full">Update</button>
+                        <button onclick="updPod('${p}', '${podSegmentKey}', 'in-pod-${idPrefix}-${safeP}')" class="text-white bg-blue-500 hover:bg-blue-600 rounded px-3 py-1 text-xs font-bold transition-colors shadow-sm w-full">Update</button>
                     </td>
                 </tr>`;
                 tbodyPod.innerHTML += row;
+            }
+
+            if (Object.keys(grpPod).length === 0) {
+                let segmentLabel = movinsPodSegmentLabels[podSegmentKey] || podSegmentKey.toUpperCase();
+                tbodyPod.innerHTML = `<tr><td colspan="4" class="px-6 py-6 text-center text-slate-500 dark:text-slate-400 italic">No export POD data found for ${segmentLabel}.</td></tr>`;
             }
         }
 
@@ -708,7 +757,7 @@
             dataSource.forEach(d => grpIso[d.type] = (grpIso[d.type]||0)+1);
             let tbodyIso = document.getElementById(isoTbodyId);
             tbodyIso.innerHTML = "";
-            
+
             for(let [t,c] of Object.entries(grpIso)) {
                 let safeT = t.replace(/[^a-zA-Z0-9]/g, "");
                 // Tentukan konteks untuk filter klik kontainer (Movins Load atau Global Editor)
@@ -730,6 +779,38 @@
             }
         }
     }
+
+    window.updateMovinsPodSelector = function() {
+        let availablePodLocs = { loc11: false, loc12: false, loc83: false };
+        globalData.forEach(d => {
+            if (d.locs.loc11) availablePodLocs.loc11 = true;
+            if (d.locs.loc12) availablePodLocs.loc12 = true;
+            if (d.locs.loc83) availablePodLocs.loc83 = true;
+        });
+
+        const selector = document.getElementById('movinsPodSelector');
+        const currentValue = selector.value;
+        selector.innerHTML = "";
+
+        Object.entries(movinsPodSegmentLabels).forEach(([key, label]) => {
+            if (!availablePodLocs[key]) return;
+            let opt = document.createElement('option');
+            opt.value = key;
+            opt.text = label;
+            selector.appendChild(opt);
+        });
+
+        if(selector.options.length === 0) {
+            let opt = document.createElement('option');
+            opt.value = "loc11";
+            opt.text = movinsPodSegmentLabels.loc11;
+            selector.appendChild(opt);
+        }
+
+        selector.value = Array.from(selector.options).some(o => o.value === currentValue)
+            ? currentValue
+            : selector.options[0].value;
+    };
 
     // Update Dropdown Segmen berdasarkan LOC yang ada di file
     window.updateLocSelector = function() {
@@ -800,7 +881,7 @@
 
         let tbodyLoc = document.getElementById('tblEditorLocBody');
         tbodyLoc.innerHTML = "";
-        
+
         for(let [val, c] of Object.entries(grpLoc)) {
             let safeVal = val.replace(/[^a-zA-Z0-9]/g, "_");
             let inputId = `in-loc-edt-${safeVal}`;
@@ -833,8 +914,12 @@
         let title = "";
 
         if(filterType === 'movins_pod') {
-            list = globalData.filter(d => d.isLoad && d.pod === value).map(d => d.containerNo);
-            title = `Containers (Load) - POD: ${value}`;
+            let segmentKey = extraParam || document.getElementById('movinsPodSelector').value;
+            list = globalData
+                .filter(d => d.isLoad && (d.locs[segmentKey] || d.pod || "") === value)
+                .map(d => d.containerNo);
+            let segmentLabel = movinsPodSegmentLabels[segmentKey] || segmentKey.toUpperCase();
+            title = `Containers (Load) - ${segmentLabel}: ${value}`;
         } else if(filterType === 'movins_iso') {
             list = globalData.filter(d => d.isLoad && d.type === value).map(d => d.containerNo);
             title = `Containers (Load) - ISO: ${value}`;
@@ -843,7 +928,7 @@
             title = `All Containers - ISO: ${value}`;
         } else if(filterType === 'editor_loc') {
             list = globalData.filter(d => d.locs[extraParam] === value).map(d => d.containerNo);
-            let locName = extraParam.toUpperCase(); 
+            let locName = extraParam.toUpperCase();
             title = `Containers - ${locName}: ${value}`;
         }
 
@@ -872,7 +957,7 @@
         const modalContent = document.getElementById('containerModalContent');
         modal.classList.remove('hidden');
         modal.classList.add('flex');
-        
+
         // Animasi pop-up
         setTimeout(() => {
             modalContent.classList.remove('scale-95');
@@ -885,7 +970,7 @@
         const modalContent = document.getElementById('containerModalContent');
         modalContent.classList.remove('scale-100');
         modalContent.classList.add('scale-95');
-        
+
         setTimeout(() => {
             modal.classList.add('hidden');
             modal.classList.remove('flex');
@@ -901,7 +986,7 @@
             tempInput.select();
             document.execCommand("copy");
             document.body.removeChild(tempInput);
-            
+
             // Temporary feedback on button
             let btn = event.currentTarget;
             let originalHtml = btn.innerHTML;
@@ -909,7 +994,7 @@
             btn.classList.replace('bg-blue-500', 'bg-green-500');
             btn.classList.replace('hover:bg-blue-600', 'hover:bg-green-600');
             btn.classList.replace('shadow-blue-500/30', 'shadow-green-500/30');
-            
+
             setTimeout(() => {
                 btn.innerHTML = originalHtml;
                 btn.classList.replace('bg-green-500', 'bg-blue-500');
@@ -953,13 +1038,40 @@
         renderEditorLocTable();
     };
 
-    // Fungsi Update untuk MOVINS Converter (Tetap menggunakan d.pod global)
-    window.updPod = function(oldP, inputId) {
+    // Fungsi Update untuk MOVINS Converter berdasarkan segment POD yang dipilih
+    window.updPod = function(oldP, podSegmentKey, inputId) {
         let newP = document.getElementById(inputId).value.toUpperCase().trim();
         if(!newP) return;
         let count = 0;
-        globalData.forEach(d => { if(d.pod === oldP) { d.pod = newP; count++; } });
-        alert(`Successfully updated ${count} containers (${oldP} -> ${newP})`);
+        const segmentPrefixMap = {
+            loc11: 'LOC+11',
+            loc12: 'LOC+12',
+            loc83: 'LOC+83'
+        };
+        let targetPrefix = segmentPrefixMap[podSegmentKey] || 'LOC+11';
+
+        globalData.forEach(d => {
+            if(!d.isLoad) return;
+            let currentVal = (d.locs[podSegmentKey] || d.pod || "").trim();
+            if(currentVal !== oldP) return;
+
+            d.locs[podSegmentKey] = newP;
+            d.pod = newP;
+
+            for(let i = 0; i < d.raw.length; i++) {
+                if(d.raw[i].startsWith(targetPrefix + "+")) {
+                    let parts = d.raw[i].split("+");
+                    if(parts.length > 2) {
+                        parts[2] = newP;
+                        d.raw[i] = parts.join("+");
+                    }
+                }
+            }
+            count++;
+        });
+
+        let segmentLabel = movinsPodSegmentLabels[podSegmentKey] || podSegmentKey.toUpperCase();
+        alert(`Successfully updated ${count} containers (${segmentLabel}: ${oldP} -> ${newP})`);
         renderAllTables();
     };
 
@@ -978,13 +1090,13 @@
         let lines = [];
         let c = 0;
         headerLines.forEach(l => { lines.push(l); if(!l.startsWith("UNB")) c++; });
-        
+
         globalData.forEach(d => {
             let blk = [];
             d.raw.forEach(orig => {
                 let s = orig;
                 let parts = s.split("+");
-                
+
                 if(s.startsWith("EQD+CN")) {
                     if(parts.length > 3) { parts[3] = d.type; s = parts.join("+"); }
                 }
@@ -1004,8 +1116,8 @@
             if(s.startsWith("UNH")) {
                 s = s.replace("BAPLIE","MOVINS").replace(/SMDG\d+/,"SMDG20");
             }
-            lines.push(s); 
-            if(!s.startsWith("UNB")) c++; 
+            lines.push(s);
+            if(!s.startsWith("UNB")) c++;
         });
         lines.push("HAN+LOA"); c++;
 
@@ -1018,12 +1130,12 @@
 
                 if(s.startsWith("LOC+11") || s.startsWith("LOC+12")) { s = `LOC+11+${d.pod}`; }
                 if(s.startsWith("LOC+9") || s.startsWith("LOC+6")) { s = `LOC+9+IDJKT`; }
-                if(s.startsWith("LOC+83")) { s = `LOC+83+${d.pod}`; } 
-                
-                if(s.startsWith("EQD+CN")) { 
-                    if(parts.length > 3) parts[3] = d.type; 
-                    if(parts.length > 2) parts[2] = ""; 
-                    s = parts.join("+"); 
+                if(s.startsWith("LOC+83")) { s = `LOC+83+${d.pod}`; }
+
+                if(s.startsWith("EQD+CN")) {
+                    if(parts.length > 3) parts[3] = d.type;
+                    if(parts.length > 2) parts[2] = "";
+                    s = parts.join("+");
                 }
                 blk.push(s);
             });
@@ -1036,20 +1148,20 @@
         let ref = "1";
         let unh = headerLines.find(x => x.startsWith("UNH"));
         if(unh) ref = unh.split("+")[1];
-        countUNT++; 
+        countUNT++;
         lines.push(`UNT+${countUNT}+${ref}`);
-        
+
         if(footerLines.length) lines.push(footerLines[0]);
         else lines.push("UNZ+1+1");
 
         let blob = new Blob([lines.join("'\n")+"'\n"], {type:"application/octet-stream"});
         let url = URL.createObjectURL(blob);
         let userFilename = document.getElementById('outFileNameInput').value.trim();
-        
+
         let finalName = userFilename;
         if(!finalName) finalName = `${prefix}_${vesselName}_${voyageNo}.edi`;
         if(!finalName.toLowerCase().endsWith(".edi")) finalName += ".edi";
-        
+
         if(userFilename === "") {
             if(prefix === "BAPLIE_DISCHARGE") finalName = "BAPLIE_DISCHARGE_" + finalName;
             else if(prefix === "MOVINS") finalName = "MOVINS_" + finalName;
