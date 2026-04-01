@@ -635,7 +635,7 @@
     }
 
     function normalizeTmpSegment(segment) {
-        if(!segment.startsWith("TMP+2+")) return segment;
+        if(!segment.startsWith("TMP+")) return segment;
 
         let parts = segment.split("+");
         if(parts.length < 3) return segment;
